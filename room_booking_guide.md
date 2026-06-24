@@ -827,13 +827,13 @@ public class RoomManageViewModel {
 ---
 
 ### com.meetingroom.viewmodel.EmployeeBookingViewModel (Employee VM)
+
 ```java
 package com.meetingroom.viewmodel;
 
 import com.meetingroom.model.Booking;
 import com.meetingroom.model.Room;
 import com.meetingroom.model.User;
-import com.meetingroom.service.BookingService;
 import com.meetingroom.service.RoomService;
 import lombok.extern.slf4j.Slf4j;
 import org.zkoss.bind.annotation.*;
@@ -841,6 +841,7 @@ import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Sessions;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -889,7 +890,7 @@ public class EmployeeBookingViewModel {
     public void bookSelectedRoom(@BindingParam("room") Room room) {
         successMessage = null;
         errorMessage = null;
-        
+
         if (selectDate == null) {
             errorMessage = "Please select a date.";
             return;
@@ -932,22 +933,69 @@ public class EmployeeBookingViewModel {
     }
 
     // Getters and Setters
-    public List<Room> getRooms() { return rooms; }
-    public List<Booking> getMyBookings() { return myBookings; }
-    public Date getSelectDate() { return selectDate; }
-    public void setSelectDate(Date selectDate) { this.selectDate = selectDate; }
-    public String getStartHour() { return startHour; }
-    public void setStartHour(String startHour) { this.startHour = startHour; }
-    public String getStartMin() { return startMin; }
-    public void setStartMin(String startMin) { this.startMin = startMin; }
-    public String getEndHour() { return endHour; }
-    public void setEndHour(String endHour) { this.endHour = endHour; }
-    public String getEndMin() { return endMin; }
-    public void setEndMin(String endMin) { this.endMin = endMin; }
-    public String getPurpose() { return purpose; }
-    public void setPurpose(String purpose) { this.purpose = purpose; }
-    public String getSuccessMessage() { return successMessage; }
-    public String getErrorMessage() { return errorMessage; }
+    public List<Room> getRooms() {
+        return rooms;
+    }
+
+    public List<Booking> getMyBookings() {
+        return myBookings;
+    }
+
+    public Date getSelectDate() {
+        return selectDate;
+    }
+
+    public void setSelectDate(Date selectDate) {
+        this.selectDate = selectDate;
+    }
+
+    public String getStartHour() {
+        return startHour;
+    }
+
+    public void setStartHour(String startHour) {
+        this.startHour = startHour;
+    }
+
+    public String getStartMin() {
+        return startMin;
+    }
+
+    public void setStartMin(String startMin) {
+        this.startMin = startMin;
+    }
+
+    public String getEndHour() {
+        return endHour;
+    }
+
+    public void setEndHour(String endHour) {
+        this.endHour = endHour;
+    }
+
+    public String getEndMin() {
+        return endMin;
+    }
+
+    public void setEndMin(String endMin) {
+        this.endMin = endMin;
+    }
+
+    public String getPurpose() {
+        return purpose;
+    }
+
+    public void setPurpose(String purpose) {
+        this.purpose = purpose;
+    }
+
+    public String getSuccessMessage() {
+        return successMessage;
+    }
+
+    public String getErrorMessage() {
+        return errorMessage;
+    }
 }
 ```
 

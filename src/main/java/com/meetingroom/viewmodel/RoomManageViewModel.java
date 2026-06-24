@@ -9,6 +9,7 @@ import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
+import com.meetingroom.util.ToastUtil;
 
 import java.util.List;
 
@@ -38,28 +39,34 @@ public class RoomManageViewModel {
         try {
             if (selectedRoom.getName() == null || selectedRoom.getName().trim().isEmpty()) {
                 errorFeedback = "Room name is required.";
+                ToastUtil.warning("Room name is required.");
                 return;
             }
             if (selectedRoom.getCapacity() <= 0) {
                 errorFeedback = "Capacity must be positive.";
+                ToastUtil.warning("Capacity must be positive.");
                 return;
             }
             if (selectedRoom.getLocation() == null || selectedRoom.getLocation().trim().isEmpty()) {
                 errorFeedback = "Location is required.";
+                ToastUtil.warning("Location is required.");
                 return;
             }
             if (selectedRoom.getId() == null) {
                 roomService.addRoom(selectedRoom);
                 feedbackMessage = "Room added successfully!";
+                ToastUtil.success("Room added successfully!");
             } else {
                 roomService.updateRoom(selectedRoom);
                 feedbackMessage = "Room updated successfully!";
+                ToastUtil.success("Room updated successfully!");
             }
             rooms = roomService.getAllRooms();
             selectedRoom = new Room();
             editing = false;
         } catch (Exception e) {
             errorFeedback = e.getMessage();
+            ToastUtil.error("Failed to save room: " + e.getMessage());
         }
     }
 
@@ -87,6 +94,7 @@ public class RoomManageViewModel {
         editing = false;
         feedbackMessage = "Room deleted successfully!";
         errorFeedback = null;
+        ToastUtil.success("Room deleted successfully!");
     }
 
     @Command

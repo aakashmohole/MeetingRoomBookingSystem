@@ -10,6 +10,7 @@ import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Sessions;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
+import com.meetingroom.util.ToastUtil;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 @Slf4j
@@ -37,11 +38,13 @@ public class LoginViewModel {
         log.info("Login attempt for username: {}", username);
         if (username == null || username.trim().isEmpty()) {
             errorMessage = "Username is required.";
+            ToastUtil.warning("Username is required.");
             log.warn("Login validation failed: Username is empty.");
             return;
         }
         if (password == null || password.trim().isEmpty()) {
             errorMessage = "Password is required.";
+            ToastUtil.warning("Password is required.");
             log.warn("Login validation failed: Password is empty.");
             return;
         }
@@ -51,10 +54,12 @@ public class LoginViewModel {
             log.info("Login successful for user: {}. Storing in session and redirecting.", user.getUsername());
             Sessions.getCurrent().setAttribute("currentUser", user);
             errorMessage = null;
+            ToastUtil.success("Welcome back, " + user.getUsername() + "!");
             Executions.sendRedirect("index.zul");
         } else {
             log.warn("Login failed for user: {}. Invalid username or password.", username);
             errorMessage = "Invalid username or password.";
+            ToastUtil.error("Invalid username or password.");
         }
     }
 

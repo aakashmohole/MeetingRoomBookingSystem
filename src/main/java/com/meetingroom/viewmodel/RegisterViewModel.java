@@ -11,6 +11,7 @@ import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Sessions;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
+import com.meetingroom.util.ToastUtil;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 @Slf4j
@@ -45,21 +46,25 @@ public class RegisterViewModel {
 
         if (username == null || username.trim().isEmpty()) {
             errorMessage = "Username is required.";
+            ToastUtil.warning("Username is required.");
             log.warn("Registration validation failed: Username is empty.");
             return;
         }
         if (email == null || email.trim().isEmpty()) {
             errorMessage = "Email is required.";
+            ToastUtil.warning("Email is required.");
             log.warn("Registration validation failed: Email is empty.");
             return;
         }
         if (password == null || password.isEmpty()) {
             errorMessage = "Password is required.";
+            ToastUtil.warning("Password is required.");
             log.warn("Registration validation failed: Password is empty.");
             return;
         }
         if (!password.equals(confirmPassword)) {
             errorMessage = "Passwords do not match.";
+            ToastUtil.warning("Passwords do not match.");
             log.warn("Registration validation failed: Passwords do not match.");
             return;
         }
@@ -75,10 +80,12 @@ public class RegisterViewModel {
             userService.registerUser(newUser);
             log.info("Registration successful for user: {}. Redirecting to login.", username);
             successMessage = "Registration successful!";
+            ToastUtil.success("Registration successful! Redirecting to sign in...");
             Executions.sendRedirect("login.zul");
         } catch (Exception e) {
             log.error("Registration failed for user: {}", username, e);
             errorMessage = e.getMessage();
+            ToastUtil.error("Registration failed: " + e.getMessage());
         }
     }
 
