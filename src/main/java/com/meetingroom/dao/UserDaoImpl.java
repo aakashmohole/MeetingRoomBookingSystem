@@ -7,11 +7,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @Transactional
-public class HibernateUserDao implements UserDao {
+public class UserDaoImpl implements UserDao {
 
     private final SessionFactory sessionFactory;
 
-    public HibernateUserDao(SessionFactory sessionFactory) {
+    public UserDaoImpl(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }
 

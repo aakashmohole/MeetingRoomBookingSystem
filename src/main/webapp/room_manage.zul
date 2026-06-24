@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul"
+    xmlns:h="http://www.w3.org/1999/xhtml">
+    <style>
+        body {
+            background-color: #f8fafc;
+            color: #0f172a;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+        .header {
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .btn-back {
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            color: #475569;
+            padding: 8px 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-back:hover {
+            background: #f1f5f9;
+            transform: translateY(-1px);
+        }
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0;
+        }
+        .card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            margin-bottom: 24px;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 0.85rem;
+            color: #475569;
+            font-weight: 500;
+        }
+        .form-input {
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 10px 14px;
+            color: #0f172a;
+            width: 100%;
+            box-sizing: border-box;
+            font-size: 0.95rem;
+        }
+        .form-input:focus {
+            border-color: #3b82f6;
+            outline: none;
+        }
+        .btn-action {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            padding: 10px 20px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(37, 99, 235, 0.1);
+        }
+        .btn-cancel {
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            color: #475569;
+            padding: 10px 20px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        .success-box {
+            background: rgba(16, 185, 129, 0.05);
+            border: 1px solid rgba(16, 185, 129, 0.15);
+            color: #059669;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+        .error-box {
+            background: rgba(239, 68, 68, 0.05);
+            border: 1px solid rgba(239, 68, 68, 0.15);
+            color: #dc2626;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+        .z-listbox {
+            border: none;
+            background: transparent;
+        }
+        .z-listheader {
+            background: #f1f5f9;
+            color: #475569;
+            font-weight: 600;
+            padding: 12px;
+            border-bottom: 2px solid #cbd5e1;
+        }
+        .z-listitem {
+            background: transparent;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .z-listcell {
+            color: #334155;
+            padding: 14px;
+        }
+    </style>
+
+    <div class="container" viewModel="@id('vm') @init('com.meetingroom.viewmodel.RoomManageViewModel')">
+        <div class="header">
+            <h:h1>Manage Meeting Rooms</h:h1>
+            <button label="Back to Dashboard" onClick="Executions.sendRedirect(&quot;index.zul&quot;)" class="btn-back"/>
+        </div>
+
+        <div class="card">
+            <h:h3 style="margin-top:0; color:#0f172a; font-weight:700;">
+                <label value="@load(vm.editing ? 'Edit Room' : 'Add New Room')"/>
+            </h:h3>
+
+            <div class="success-box" if="${not empty vm.feedbackMessage}">
+                <label value="@load(vm.feedbackMessage)"/>
+            </div>
+
+            <div class="error-box" if="${not empty vm.errorFeedback}">
+                <label value="@load(vm.errorFeedback)"/>
+            </div>
+
+            <div class="form-group">
+                <h:label class="form-label">Room Name</h:label>
+                <textbox value="@bind(vm.selectedRoom.name)" class="form-input" placeholder="e.g. Boardroom A"/>
+            </div>
+
+            <div class="form-group">
+                <h:label class="form-label">Capacity</h:label>
+                <intbox value="@bind(vm.selectedRoom.capacity)" class="form-input" placeholder="e.g. 10"/>
+            </div>
+
+            <div class="form-group">
+                <h:label class="form-label">Location / Floor</h:label>
+                <textbox value="@bind(vm.selectedRoom.location)" class="form-input" placeholder="e.g. 2nd Floor, West Wing"/>
+            </div>
+
+            <div class="form-group">
+                <h:label class="form-label">Amenities (Comma separated)</h:label>
+                <textbox value="@bind(vm.selectedRoom.amenities)" class="form-input" placeholder="e.g. Projector, Whiteboard, TV"/>
+            </div>
+
+            <button label="Save Room" onClick="@command('saveRoom')" class="btn-action"/>
+            <button label="Cancel" onClick="@command('cancelEdit')" class="btn-cancel" if="${vm.editing}"/>
+        </div>
+
+        <div class="card">
+            <h:h3 style="margin-top:0; color:#0f172a; font-weight:700;">Room Inventory List</h:h3>
+            <listbox model="@load(vm.rooms)" emptyMessage="No rooms found.">
+                <listhead>
+                    <listheader label="Room Name" width="25%"/>
+                    <listheader label="Capacity" width="15%"/>
+                    <listheader label="Location" width="30%"/>
+                    <listheader label="Amenities" width="20%"/>
+                    <listheader label="Actions" width="10%"/>
+                </listhead>
+                <template name="model" var="room">
+                    <listitem>
+                        <listcell><label value="@load(room.name)" style="font-weight:bold;"/></listcell>
+                        <listcell><label value="@load(room.capacity)"/><label value=" seats"/></listcell>
+                        <listcell><label value="@load(room.location)"/></listcell>
+                        <listcell><label value="@load(room.amenities)"/></listcell>
+                        <listcell>
+                            <hlayout spacing="8px">
+                                <a label="Edit" onClick="@command('editRoom', room=room)" style="color:#2563eb; cursor:pointer; font-weight:600;"/>
+                                <a label="Delete" onClick="@command('deleteRoom', id=room.id)" style="color:#dc2626; cursor:pointer; font-weight:600;"/>
+                            </hlayout>
+                        </listcell>
+                    </listitem>
+                </template>
+            </listbox>
+        </div>
+    </div>
+</zk>
