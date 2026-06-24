@@ -10,7 +10,7 @@
             padding: 0;
         }
         .container {
-            max-width: 1000px;
+            max-width: 1100px;
             margin: 40px auto;
             padding: 20px;
         }
@@ -47,7 +47,7 @@
             border: 1px solid #e2e8f0;
             border-radius: 16px;
             padding: 24px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
             margin-bottom: 24px;
         }
         .form-row {
@@ -91,51 +91,6 @@
             align-items: center;
             gap: 6px;
         }
-        .btn-book {
-            background: linear-gradient(135deg, #3b82f6, #2563eb);
-            border: none;
-            border-radius: 8px;
-            color: white;
-            padding: 8px 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .btn-book:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
-        }
-        .btn-cancel {
-            background: rgba(239, 68, 68, 0.05);
-            border: 1px solid rgba(239, 68, 68, 0.15);
-            border-radius: 8px;
-            color: #dc2626;
-            padding: 6px 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .btn-cancel:hover {
-            background: rgba(239, 68, 68, 0.1);
-        }
-        .success-box {
-            background: rgba(16, 185, 129, 0.05);
-            border: 1px solid rgba(16, 185, 129, 0.15);
-            color: #059669;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 16px;
-            text-align: center;
-        }
-        .error-box {
-            background: rgba(239, 68, 68, 0.05);
-            border: 1px solid rgba(239, 68, 68, 0.15);
-            color: #dc2626;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 16px;
-            text-align: center;
-        }
         .z-datebox {
             display: inline-block;
             width: 100%;
@@ -153,24 +108,109 @@
         .z-datebox-input:focus {
             border-color: #3b82f6 !important;
         }
-        .z-listbox {
-            border: none;
-            background: transparent;
+        
+        /* Grid and Card redesign */
+        .room-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+            margin-top: 16px;
         }
-        .z-listheader {
+        .room-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .room-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(37, 99, 235, 0.3);
+            box-shadow: 0 12px 25px -5px rgba(37, 99, 235, 0.08), 0 8px 10px -6px rgba(37, 99, 235, 0.05);
+        }
+        .room-name {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #0f172a;
+            margin: 0 0 12px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        .room-badge {
+            font-size: 0.75rem;
+            padding: 4px 8px;
+            border-radius: 9999px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .badge-available {
+            background: rgba(16, 185, 129, 0.08);
+            color: #059669;
+        }
+        .badge-busy {
+            background: rgba(239, 68, 68, 0.08);
+            color: #dc2626;
+        }
+        .room-detail {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #475569;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+        .room-amenities {
+            margin: 16px 0 20px 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .amenity-tag {
             background: #f1f5f9;
             color: #475569;
+            border: 1px solid #e2e8f0;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
             font-weight: 600;
-            padding: 12px;
-            border-bottom: 2px solid #cbd5e1;
         }
-        .z-listitem {
-            background: transparent;
-            border-bottom: 1px solid #e2e8f0;
+        .btn-book {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            padding: 12px 20px;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: center;
+            width: 100%;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.15);
         }
-        .z-listcell {
-            color: #334155;
-            padding: 14px;
+        .btn-book:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 15px -3px rgba(37, 99, 235, 0.25);
+        }
+        .btn-book:active {
+            transform: translateY(0);
+        }
+        .btn-book.btn-disabled {
+            background: #cbd5e1 !important;
+            color: #94a3b8 !important;
+            cursor: not-allowed !important;
+            box-shadow: none !important;
+        }
+        .btn-book.btn-disabled:hover {
+            transform: none !important;
+            box-shadow: none !important;
         }
     </style>
 
@@ -180,16 +220,9 @@
             <button label="Back to Dashboard" onClick="Executions.sendRedirect(&quot;index.zul&quot;)" class="btn-back"/>
         </div>
 
+        <!-- 1. Select Date & Time Slot Card -->
         <div class="card">
             <h:h3 style="margin-top:0; color:#0f172a; font-weight:700;">1. Select Date &amp; Time Slot</h:h3>
-
-            <div class="success-box" if="${not empty vm.successMessage}">
-                <label value="@load(vm.successMessage)"/>
-            </div>
-
-            <div class="error-box" if="${not empty vm.errorMessage}">
-                <label value="@load(vm.errorMessage)"/>
-            </div>
 
             <div class="form-row">
                 <div class="form-item">
@@ -199,51 +232,54 @@
 
                 <div class="form-item">
                     <h:label class="form-label">Start Time</h:label>
-                    <div class="time-picker">
-                        <h:select value="@bind(vm.startHour)" class="form-input" style="width: 80px;">
-                            <h:option value="08">08</h:option>
-                            <h:option value="09">09</h:option>
-                            <h:option value="10">10</h:option>
-                            <h:option value="11">11</h:option>
-                            <h:option value="12">12</h:option>
-                            <h:option value="13">13</h:option>
-                            <h:option value="14">14</h:option>
-                            <h:option value="15">15</h:option>
-                            <h:option value="16">16</h:option>
-                            <h:option value="17">17</h:option>
-                            <h:option value="18">18</h:option>
-                        </h:select>
-                        <label value=":" style="color: #475569; font-weight: bold;"/>
-                        <h:select value="@bind(vm.startMin)" class="form-input" style="width: 80px;">
-                            <h:option value="00">00</h:option>
-                            <h:option value="30">30</h:option>
-                        </h:select>
-                    </div>
+                    <listbox mold="select" selectedItem="@bind(vm.startTime)" class="form-input">
+                        <listitem label="08:00 AM" value="08:00"/>
+                        <listitem label="08:30 AM" value="08:30"/>
+                        <listitem label="09:00 AM" value="09:00" selected="true"/>
+                        <listitem label="09:30 AM" value="09:30"/>
+                        <listitem label="10:00 AM" value="10:00"/>
+                        <listitem label="10:30 AM" value="10:30"/>
+                        <listitem label="11:00 AM" value="11:00"/>
+                        <listitem label="11:30 AM" value="11:30"/>
+                        <listitem label="12:00 PM" value="12:00"/>
+                        <listitem label="12:30 PM" value="12:30"/>
+                        <listitem label="01:00 PM" value="13:00"/>
+                        <listitem label="01:30 PM" value="13:30"/>
+                        <listitem label="02:00 PM" value="14:00"/>
+                        <listitem label="02:30 PM" value="14:30"/>
+                        <listitem label="03:00 PM" value="15:00"/>
+                        <listitem label="03:30 PM" value="15:30"/>
+                        <listitem label="04:00 PM" value="16:00"/>
+                        <listitem label="04:30 PM" value="16:30"/>
+                        <listitem label="05:00 PM" value="17:00"/>
+                        <listitem label="05:30 PM" value="17:30"/>
+                    </listbox>
                 </div>
 
                 <div class="form-item">
                     <h:label class="form-label">End Time</h:label>
-                    <div class="time-picker">
-                        <h:select value="@bind(vm.endHour)" class="form-input" style="width: 80px;">
-                            <h:option value="08">08</h:option>
-                            <h:option value="09">09</h:option>
-                            <h:option value="10">10</h:option>
-                            <h:option value="11">11</h:option>
-                            <h:option value="12">12</h:option>
-                            <h:option value="13">13</h:option>
-                            <h:option value="14">14</h:option>
-                            <h:option value="15">15</h:option>
-                            <h:option value="16">16</h:option>
-                            <h:option value="17">17</h:option>
-                            <h:option value="18">18</h:option>
-                            <h:option value="19">19</h:option>
-                        </h:select>
-                        <label value=":" style="color: #475569; font-weight: bold;"/>
-                        <h:select value="@bind(vm.endMin)" class="form-input" style="width: 80px;">
-                            <h:option value="00">00</h:option>
-                            <h:option value="30">30</h:option>
-                        </h:select>
-                    </div>
+                    <listbox mold="select" selectedItem="@bind(vm.endTime)" class="form-input">
+                        <listitem label="08:30 AM" value="08:30"/>
+                        <listitem label="09:00 AM" value="09:00"/>
+                        <listitem label="09:30 AM" value="09:30"/>
+                        <listitem label="10:00 AM" value="10:00" selected="true"/>
+                        <listitem label="10:30 AM" value="10:30"/>
+                        <listitem label="11:00 AM" value="11:00"/>
+                        <listitem label="11:30 AM" value="11:30"/>
+                        <listitem label="12:00 PM" value="12:00"/>
+                        <listitem label="12:30 PM" value="12:30"/>
+                        <listitem label="01:00 PM" value="13:00"/>
+                        <listitem label="01:30 PM" value="13:30"/>
+                        <listitem label="02:00 PM" value="14:00"/>
+                        <listitem label="02:30 PM" value="14:30"/>
+                        <listitem label="03:00 PM" value="15:00"/>
+                        <listitem label="03:30 PM" value="15:30"/>
+                        <listitem label="04:00 PM" value="16:00"/>
+                        <listitem label="04:30 PM" value="16:30"/>
+                        <listitem label="05:00 PM" value="17:00"/>
+                        <listitem label="05:30 PM" value="17:30"/>
+                        <listitem label="06:00 PM" value="18:00"/>
+                    </listbox>
                 </div>
             </div>
 
@@ -253,60 +289,42 @@
             </div>
         </div>
 
-        <div class="card">
-            <h:h3 style="margin-top:0; color:#0f172a; font-weight:700;">2. Select a Room to Book</h:h3>
-            <listbox model="@load(vm.rooms)" emptyMessage="No rooms configured.">
-                <listhead>
-                    <listheader label="Room Name" width="30%"/>
-                    <listheader label="Capacity" width="20%"/>
-                    <listheader label="Location" width="30%"/>
-                    <listheader label="Amenities" width="10%"/>
-                    <listheader label="Action" width="10%"/>
-                </listhead>
-                <template name="model" var="room">
-                    <listitem>
-                        <listcell><label value="@load(room.name)" style="font-weight:bold;"/></listcell>
-                        <listcell><label value="@load(room.capacity)"/><label value=" seats"/></listcell>
-                        <listcell><label value="@load(room.location)"/></listcell>
-                        <listcell><label value="@load(room.amenities)"/></listcell>
-                        <listcell>
-                            <button label="Book" onClick="@command('bookSelectedRoom', room=room)" class="btn-book"/>
-                        </listcell>
-                    </listitem>
-                </template>
-            </listbox>
-        </div>
-
-        <div class="card">
-            <h:h3 style="margin-top:0; color:#0f172a; font-weight:700;">My Bookings History</h:h3>
-            <listbox model="@load(vm.myBookings)" emptyMessage="You have no bookings recorded.">
-                <listhead>
-                    <listheader label="Room Name" width="20%"/>
-                    <listheader label="Booking Date" width="15%"/>
-                    <listheader label="Start Time" width="15%"/>
-                    <listheader label="End Time" width="15%"/>
-                    <listheader label="Purpose" width="25%"/>
-                    <listheader label="Status" width="10%"/>
-                    <listheader label="Action" width="10%"/>
-                </listhead>
-                <template name="model" var="booking">
-                    <listitem>
-                        <listcell><label value="@load(booking.room.name)"/></listcell>
-                        <listcell><label value="@load(booking.bookingDate)"/></listcell>
-                        <listcell><label value="@load(booking.startTime)"/></listcell>
-                        <listcell><label value="@load(booking.endTime)"/></listcell>
-                        <listcell><label value="@load(booking.purpose)"/></listcell>
-                        <listcell>
-                            <label value="@load(booking.status)"
-                                   style="@load(booking.status eq 'CONFIRMED' ? 'color:#059669; font-weight:600;' : 'color:#64748b; text-decoration:line-through;')"/>
-                        </listcell>
-                        <listcell>
-                            <button label="Cancel" onClick="@command('cancelBooking', id=booking.id)"
-                                    class="btn-cancel" if="${booking.status eq 'CONFIRMED'}"/>
-                        </listcell>
-                    </listitem>
-                </template>
-            </listbox>
+        <!-- 2. Select a Room Card Grid -->
+        <h:h3 style="color:#0f172a; font-weight:700; margin-bottom:16px; font-size:1.4rem;">2. Choose an Available Room</h:h3>
+        
+        <div class="room-grid" children="@load(vm.rooms)">
+            <template name="children" var="room">
+                <div class="room-card">
+                    <div>
+                        <div class="room-name">
+                            <label value="@load(room.name)"/>
+                            <label value="@load(vm.isRoomBusy(room) ? 'Busy' : 'Available')" 
+                                   class="@load(vm.isRoomBusy(room) ? 'room-badge badge-busy' : 'room-badge badge-available')"/>
+                        </div>
+                        <div class="room-detail">
+                            <label value="👥"/>
+                            <label value="@load(room.capacity)"/>
+                            <label value=" Seats capacity"/>
+                        </div>
+                        <div class="room-detail">
+                            <label value="📍"/>
+                            <label value="@load(room.location)"/>
+                        </div>
+                        
+                        <!-- Dynamic Amenities Badges -->
+                        <div class="room-amenities" children="@load(room.amenitiesList)">
+                            <template name="children" var="amenity">
+                                <label value="@load(amenity)" class="amenity-tag"/>
+                            </template>
+                        </div>
+                    </div>
+                    
+                    <button label="@load(vm.isRoomBusy(room) ? 'Room Busy' : 'Book Room')" 
+                            onClick="@command('bookSelectedRoom', room=room)" 
+                            disabled="@load(vm.isRoomBusy(room))"
+                            class="@load(vm.isRoomBusy(room) ? 'btn-book btn-disabled' : 'btn-book')"/>
+                </div>
+            </template>
         </div>
     </div>
 </zk>

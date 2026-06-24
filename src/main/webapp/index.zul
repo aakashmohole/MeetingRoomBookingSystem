@@ -176,6 +176,38 @@
             font-weight: 500;
             text-transform: uppercase;
         }
+        .btn-cancel {
+            background: rgba(239, 68, 68, 0.05);
+            border: 1px solid rgba(239, 68, 68, 0.15);
+            border-radius: 8px;
+            color: #dc2626;
+            padding: 8px 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-cancel:hover {
+            background: rgba(239, 68, 68, 0.1);
+        }
+        .z-listbox {
+            border: none;
+            background: transparent;
+        }
+        .z-listheader {
+            background: #f1f5f9;
+            color: #475569;
+            font-weight: 600;
+            padding: 12px;
+            border-bottom: 2px solid #cbd5e1;
+        }
+        .z-listitem {
+            background: transparent;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .z-listcell {
+            color: #334155;
+            padding: 14px;
+        }
     </style>
 
     <div class="app-container" viewModel="@id('vm') @init('com.meetingroom.viewmodel.MainViewModel')">
@@ -231,14 +263,33 @@
                 <div class="action-card">
                     <h:h3 class="action-title">My Bookings</h:h3>
                     <h:p class="action-desc">View and manage your active and past reservations.</h:p>
-                    <button label="View Reservations" class="btn-secondary" style="margin-top: 10px;"/>
+                    <button label="View Reservations" class="btn-secondary" style="margin-top: 10px;" onClick="Executions.sendRedirect(&quot;my_bookings.zul&quot;)"/>
                 </div>
             </div>
-            <div class="card" style="margin-top: 24px; padding: 24px;">
+            <div class="card" style="margin-top: 24px; padding: 24px;" visible="@load(not empty vm.upcomingBookings)">
                 <h:h3 class="panel-subtitle">Upcoming Reservations</h:h3>
-                <div class="empty-state">
-                    <label value="No upcoming reservations found. Go book a room!"/>
-                </div>
+                <listbox model="@load(vm.upcomingBookings)" emptyMessage="No upcoming reservations found.">
+                    <listhead>
+                        <listheader label="Room Name" width="25%"/>
+                        <listheader label="Date" width="20%"/>
+                        <listheader label="Time" width="30%"/>
+                        <listheader label="Purpose" width="15%"/>
+                        <listheader label="Action" width="10%"/>
+                    </listhead>
+                    <template name="model" var="booking">
+                        <listitem>
+                            <listcell><label value="@load(booking.room.name)" style="font-weight:bold;"/></listcell>
+                            <listcell><label value="@load(booking.bookingDate)"/></listcell>
+                            <listcell>
+                                <label value="@load(booking.startTime)"/> - <label value="@load(booking.endTime)"/>
+                            </listcell>
+                            <listcell><label value="@load(booking.purpose)"/></listcell>
+                            <listcell>
+                                <button label="Cancel" onClick="@command('cancelBookingFromDashboard', id=booking.id)" class="btn-cancel" style="padding: 6px 12px; font-size: 0.85rem;"/>
+                            </listcell>
+                        </listitem>
+                    </template>
+                </listbox>
             </div>
         </div>
 

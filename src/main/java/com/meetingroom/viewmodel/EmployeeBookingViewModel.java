@@ -38,10 +38,8 @@ public class EmployeeBookingViewModel {
     // Filter & Booking State variables
     private Room selectedRoom;
     private Date selectDate = new Date(); // Bound to ZK datebox
-    private String startHour = "09";     // Bound to listbox hours
-    private String startMin = "00";
-    private String endHour = "10";
-    private String endMin = "00";
+    private String startTime = "09:00";   // Bound to start time select (HH:mm)
+    private String endTime = "10:00";     // Bound to end time select (HH:mm)
     private String purpose;
 
     private String successMessage;
@@ -58,8 +56,31 @@ public class EmployeeBookingViewModel {
         myBookings = bookingService.getBookingsByUser(currentUser.getId());
     }
 
+    public boolean isRoomBusy(Room room) {
+        if (room == null || selectDate == null || startTime == null || endTime == null) {
+            return false;
+        }
+        try {
+            LocalDate date = selectDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            LocalTime start = LocalTime.parse(startTime);
+            LocalTime end = LocalTime.parse(endTime);
+            if (start.isAfter(end) || start.equals(end)) {
+                return false;
+            }
+            List<Booking> roomBookings = bookingService.getBookingsByRoom(room.getId());
+            return roomBookings.stream()
+                    .anyMatch(b -> "CONFIRMED".equals(b.getStatus()) &&
+                            b.getBookingDate().isEqual(date) &&
+                            b.getStartTime().isBefore(end) &&
+                            b.getEndTime().isAfter(start));
+        } catch (Exception e) {
+            log.error("Error checking room status", e);
+            return false;
+        }
+    }
+
     @Command
-    @NotifyChange({"myBookings", "successMessage", "errorMessage", "purpose"})
+    @NotifyChange({"rooms", "myBookings", "successMessage", "errorMessage", "purpose"})
     public void bookSelectedRoom(@BindingParam("room") Room room) {
         successMessage = null;
         errorMessage = null;
@@ -77,8 +98,8 @@ public class EmployeeBookingViewModel {
 
         try {
             LocalDate date = selectDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-            LocalTime start = LocalTime.of(Integer.parseInt(startHour), Integer.parseInt(startMin));
-            LocalTime end = LocalTime.of(Integer.parseInt(endHour), Integer.parseInt(endMin));
+            LocalTime start = LocalTime.parse(startTime);
+            LocalTime end = LocalTime.parse(endTime);
 
             Booking booking = Booking.builder()
                     .user(currentUser)
@@ -101,7 +122,7 @@ public class EmployeeBookingViewModel {
     }
 
     @Command
-    @NotifyChange({"myBookings", "successMessage", "errorMessage"})
+    @NotifyChange({"rooms", "myBookings", "successMessage", "errorMessage"})
     public void cancelBooking(@BindingParam("id") Long id) {
         bookingService.cancelBooking(id);
         myBookings = bookingService.getBookingsByUser(currentUser.getId());
@@ -123,40 +144,27 @@ public class EmployeeBookingViewModel {
         return selectDate;
     }
 
+    @NotifyChange("rooms")
     public void setSelectDate(Date selectDate) {
         this.selectDate = selectDate;
     }
 
-    public String getStartHour() {
-        return startHour;
+    public String getStartTime() {
+        return startTime;
     }
 
-    public void setStartHour(String startHour) {
-        this.startHour = startHour;
+    @NotifyChange("rooms")
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
     }
 
-    public String getStartMin() {
-        return startMin;
+    public String getEndTime() {
+        return endTime;
     }
 
-    public void setStartMin(String startMin) {
-        this.startMin = startMin;
-    }
-
-    public String getEndHour() {
-        return endHour;
-    }
-
-    public void setEndHour(String endHour) {
-        this.endHour = endHour;
-    }
-
-    public String getEndMin() {
-        return endMin;
-    }
-
-    public void setEndMin(String endMin) {
-        this.endMin = endMin;
+    @NotifyChange("rooms")
+    public void setEndTime(String endTime) {
+        this.endTime = endTime;
     }
 
     public String getPurpose() {
@@ -174,5 +182,4 @@ public class EmployeeBookingViewModel {
     public String getErrorMessage() {
         return errorMessage;
     }
-
 }

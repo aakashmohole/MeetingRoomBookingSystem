@@ -29,4 +29,15 @@ public class Room {
 
     @Column(name = "amenities")
     private String amenities;
+
+    public String[] getAmenitiesList() {
+        if (amenities == null || amenities.trim().isEmpty()) {
+            return new String[0];
+        }
+        String[] parts = amenities.split(",");
+        for (int i = 0; i < parts.length; i++) {
+            parts[i] = parts[i].trim();
+        }
+        return parts;
+    }
 }
