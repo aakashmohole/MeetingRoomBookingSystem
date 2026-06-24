@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul"
+    xmlns:h="http://www.w3.org/1999/xhtml">
+    <style>
+        body {
+            background-color: #0f172a;
+            color: #f8fafc;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .register-container {
+            width: 100%;
+            max-width: 420px;
+            padding: 20px;
+        }
+        .card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+        }
+        .header {
+            margin-bottom: 24px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0 0 8px 0;
+        }
+        .header p {
+            color: #94a3b8;
+            font-size: 0.95rem;
+            margin: 0;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #94a3b8;
+        }
+        .form-input {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            padding: 10px 14px;
+            color: #f8fafc;
+            width: 100%;
+            box-sizing: border-box;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+        .form-input:focus {
+            border-color: #38bdf8;
+            background: rgba(15, 23, 42, 0.8);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
+        }
+        select.form-input option {
+            background-color: #1e293b;
+            color: #f8fafc;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #38bdf8, #818cf8);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            padding: 12px 20px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            margin-top: 10px;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(56, 189, 248, 0.4);
+        }
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #f87171;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .success-message {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            color: #34d399;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .footer-text {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+        .footer-link {
+            color: #38bdf8;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .footer-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+
+    <div class="register-container" viewModel="@id('vm') @init('com.meetingroom.viewmodel.RegisterViewModel')">
+        <div class="card">
+            <div class="header">
+                <h:h1>Create Account</h:h1>
+                <h:p>Join us to start booking meeting rooms</h:p>
+            </div>
+
+            <div class="error-message" if="${not empty vm.errorMessage}">
+                <label value="@load(vm.errorMessage)"/>
+            </div>
+
+            <div class="success-message" if="${not empty vm.successMessage}">
+                <label value="@load(vm.successMessage)"/>
+            </div>
+
+            <div class="form-group">
+                <h:label class="form-label">Username</h:label>
+                <textbox value="@bind(vm.username)" class="form-input" placeholder="Choose a username"/>
+            </div>
+
+            <div class="form-group">
+                <h:label class="form-label">Email Address</h:label>
+                <textbox value="@bind(vm.email)" class="form-input" placeholder="you@example.com"/>
+            </div>
+
+            <div class="form-group">
+                <h:label class="form-label">Password</h:label>
+                <textbox value="@bind(vm.password)" type="password" class="form-input" placeholder="Create a password"/>
+            </div>
+
+            <div class="form-group">
+                <h:label class="form-label">Confirm Password</h:label>
+                <textbox value="@bind(vm.confirmPassword)" type="password" class="form-input" placeholder="Confirm your password"/>
+            </div>
+
+            <div class="form-group">
+                <h:label class="form-label">Role</h:label>
+                <listbox mold="select" onSelect="@command('selectRole', val=self.selectedItem.value)" class="form-input">
+                    <listitem label="Employee" value="EMPLOYEE" selected="true"/>
+                    <listitem label="Admin" value="ADMIN"/>
+                </listbox>
+            </div>
+
+            <button label="Sign Up" onClick="@command('register')" class="btn-primary"/>
+
+            <div class="footer-text">
+                Already have an account? 
+                <a label="Sign In" onClick="@command('navigateToLogin')" class="footer-link"/>
+            </div>
+        </div>
+    </div>
+</zk>
