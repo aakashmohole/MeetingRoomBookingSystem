@@ -1,10 +1,6 @@
-SHOW DATABASES;
-
 CREATE DATABASE IF NOT EXISTS meeting_room_booking;
 
 USE meeting_room_booking;
-
-SELECT * FROM users;
 
 CREATE TABLE IF NOT EXISTS users (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
@@ -23,9 +19,6 @@ CREATE TABLE IF NOT EXISTS rooms (
      amenities VARCHAR(255) -- E.g. 'Projector, Whiteboard, Video Conference'
 );
 
-SELECT * FROM rooms;
-
-DROP TABLE bookings;
 -- Table for Room Bookings
 CREATE TABLE IF NOT EXISTS bookings (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
@@ -42,4 +35,3 @@ CREATE TABLE IF NOT EXISTS bookings (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (room_id) REFERENCES rooms(id) ON DELETE CASCADE
 );
-SELECT * FROM bookings;

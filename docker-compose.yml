@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: room-booking-db
+    restart: always
+    environment:
+      MYSQL_DATABASE: meeting_room_booking
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3307:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+      # Automatically initializes the schema on first start
+      - ./src/main/resources/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+
+  web:
+    build: .
+    container_name: room-booking-app
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      # Inject Java System Properties to override database connection details dynamically inside the container
+      CATALINA_OPTS: "-Ddb.url=jdbc:mysql://db:3306/meeting_room_booking?useSSL=false\\&allowPublicKeyRetrieval=true\\&serverTimezone=UTC -Ddb.username=root -Ddb.password=root"
+
+volumes:
+  db-data:
