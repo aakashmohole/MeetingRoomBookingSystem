@@ -140,7 +140,7 @@
             <button label="Sign In" onClick="@command('login')" class="btn-primary"/>
 
             <div class="footer-text">
-                Don't have an account? 
+                Don't have an account?
                 <a label="Register" onClick="@command('navigateToRegister')" class="footer-link"/>
             </div>
         </div>
