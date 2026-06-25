@@ -9,10 +9,16 @@
             margin: 0;
             padding: 0;
         }
-        .container {
-            max-width: 1000px;
-            margin: 40px auto;
-            padding: 20px;
+        .app-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+        .main-content {
+            margin-left: 260px;
+            padding: 40px;
+            flex: 1;
+            background: #f8fafc;
+            box-sizing: border-box;
         }
         .header {
             margin-bottom: 24px;
@@ -133,11 +139,18 @@
         }
     </style>
 
-    <div class="container" viewModel="@id('vm') @init('com.meetingroom.viewmodel.RoomManageViewModel')">
-        <div class="header">
-            <h:h1>Manage Meeting Rooms</h:h1>
-            <button label="Back to Dashboard" onClick="Executions.sendRedirect(&quot;index.zul&quot;)" class="btn-back"/>
-        </div>
+    <div class="app-layout" viewModel="@id('vm') @init('com.meetingroom.viewmodel.RoomManageViewModel')">
+        <!-- Include Sidebar -->
+        <include src="sidebar.zul" />
+
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <div class="header">
+                <div>
+                    <h:h1>Manage Meeting Rooms</h:h1>
+                    <h:p style="color: #64748b; margin-top: 4px; margin-bottom: 0;">Add, edit, or remove meeting rooms in the system inventory</h:p>
+                </div>
+            </div>
 
         <div class="card">
             <h:h3 style="margin-top:0; color:#0f172a; font-weight:700;">
@@ -203,4 +216,5 @@
             </listbox>
         </div>
     </div>
+</div>
 </zk>

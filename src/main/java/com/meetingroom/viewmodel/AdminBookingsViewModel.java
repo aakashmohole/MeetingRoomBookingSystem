@@ -42,6 +42,13 @@ public class AdminBookingsViewModel {
     private String selectedStatus = "ALL";
     private Date filterDate;
 
+    // Remarks dialog state
+    private boolean remarksDialogOpen = false;
+    private Booking selectedBooking;
+    private String remarksText = "";
+    private String pendingStatus = "";
+    private String dialogTitle = "";
+
     @Init
     public void init() {
         currentUser = (User) Sessions.getCurrent().getAttribute("currentUser");
@@ -121,32 +128,46 @@ public class AdminBookingsViewModel {
     }
 
     @Command
-    @NotifyChange({"filteredBookings", "totalBookings", "activeBookings", "cancelledBookings"})
-    public void approveBooking(@BindingParam("booking") Booking booking) {
-        if (booking == null) return;
-        try {
-            booking.setStatus("CONFIRMED");
-            bookingService.updateBooking(booking);
-            ToastUtil.success("Booking for " + booking.getRoom().getName() + " has been approved.");
-            loadData();
-        } catch (Exception e) {
-            log.error("Failed to approve booking", e);
-            ToastUtil.error("Failed to approve booking: " + e.getMessage());
-        }
+    @NotifyChange({"remarksDialogOpen", "selectedBooking", "remarksText", "pendingStatus", "dialogTitle"})
+    public void openRemarksDialog(@BindingParam("booking") Booking booking, @BindingParam("status") String status) {
+        if (booking == null || status == null) return;
+        this.selectedBooking = booking;
+        this.pendingStatus = status;
+        this.remarksText = "";
+        this.dialogTitle = "CONFIRMED".equalsIgnoreCase(status) ? "Approve Booking" : "Cancel Booking";
+        this.remarksDialogOpen = true;
     }
 
     @Command
-    @NotifyChange({"filteredBookings", "totalBookings", "activeBookings", "cancelledBookings"})
-    public void cancelBooking(@BindingParam("booking") Booking booking) {
-        if (booking == null) return;
+    @NotifyChange({"remarksDialogOpen", "selectedBooking", "remarksText", "pendingStatus"})
+    public void closeRemarksDialog() {
+        this.remarksDialogOpen = false;
+        this.selectedBooking = null;
+        this.remarksText = "";
+        this.pendingStatus = "";
+    }
+
+    @Command
+    @NotifyChange({"filteredBookings", "totalBookings", "activeBookings", "cancelledBookings", "remarksDialogOpen", "selectedBooking", "remarksText"})
+    public void submitStatusUpdate() {
+        if (selectedBooking == null || pendingStatus == null || pendingStatus.isEmpty()) {
+            ToastUtil.error("No active booking selected.");
+            return;
+        }
         try {
-            booking.setStatus("CANCELLED");
-            bookingService.updateBooking(booking);
-            ToastUtil.success("Booking for " + booking.getRoom().getName() + " has been cancelled.");
+            selectedBooking.setStatus(pendingStatus);
+            selectedBooking.setAdminRemarks(remarksText != null ? remarksText.trim() : "");
+            selectedBooking.setNotificationRead(false); // Mark as unread so employee gets notified
+            bookingService.updateBooking(selectedBooking);
+            
+            String action = "CONFIRMED".equalsIgnoreCase(pendingStatus) ? "approved" : "cancelled";
+            ToastUtil.success("Booking for " + selectedBooking.getRoom().getName() + " has been " + action + ".");
+            
+            closeRemarksDialog();
             loadData();
         } catch (Exception e) {
-            log.error("Failed to cancel booking", e);
-            ToastUtil.error("Failed to cancel booking: " + e.getMessage());
+            log.error("Failed to update booking status", e);
+            ToastUtil.error("Failed to update booking status: " + e.getMessage());
         }
     }
 
@@ -161,4 +182,12 @@ public class AdminBookingsViewModel {
     public void setSelectedStatus(String selectedStatus) { this.selectedStatus = selectedStatus; }
     public Date getFilterDate() { return filterDate; }
     public void setFilterDate(Date filterDate) { this.filterDate = filterDate; }
+
+    // Dialog Getters and Setters
+    public boolean isRemarksDialogOpen() { return remarksDialogOpen; }
+    public Booking getSelectedBooking() { return selectedBooking; }
+    public String getRemarksText() { return remarksText; }
+    public void setRemarksText(String remarksText) { this.remarksText = remarksText; }
+    public String getPendingStatus() { return pendingStatus; }
+    public String getDialogTitle() { return dialogTitle; }
 }

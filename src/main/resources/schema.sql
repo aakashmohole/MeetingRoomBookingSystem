@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS rooms (
 
 SELECT * FROM rooms;
 
+DROP TABLE bookings;
 -- Table for Room Bookings
 CREATE TABLE IF NOT EXISTS bookings (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
@@ -35,6 +36,8 @@ CREATE TABLE IF NOT EXISTS bookings (
     end_time TIME NOT NULL,
     purpose VARCHAR(255) NOT NULL,
     status VARCHAR(20) NOT NULL DEFAULT 'CONFIRMED', -- 'CONFIRMED' or 'CANCELLED'
+    admin_remarks VARCHAR(255),
+    notification_read BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (room_id) REFERENCES rooms(id) ON DELETE CASCADE

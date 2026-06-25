@@ -9,14 +9,19 @@
             margin: 0;
             padding: 0;
         }
-        .app-container {
-            max-width: 900px;
-            margin: 60px auto;
-            padding: 20px;
+        .app-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+        .main-content {
+            margin-left: 260px;
+            padding: 40px;
+            flex: 1;
+            background: #f8fafc;
+            box-sizing: border-box;
         }
         .header {
-            margin-bottom: 40px;
-            text-align: center;
+            margin-bottom: 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -208,110 +213,175 @@
             color: #334155;
             padding: 14px;
         }
+        
+        /* Notification Banners */
+        .notification-banner {
+            border-radius: 12px;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            animation: fadeIn 0.3s ease;
+        }
+        .banner-success {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: #166534;
+        }
+        .banner-danger {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+        }
+        .notification-content {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            flex: 1;
+        }
+        .notification-icon {
+            font-size: 1.2rem;
+            line-height: 1;
+        }
+        .notification-text {
+            margin: 0;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+        .notification-remarks {
+            font-size: 0.85rem;
+            margin-top: 4px;
+            opacity: 0.9;
+        }
+        .btn-dismiss {
+            background: transparent;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-left: 16px;
+        }
+        .btn-dismiss-success {
+            border: 1px solid #166534;
+            color: #166534;
+        }
+        .btn-dismiss-success:hover {
+            background: #166534;
+            color: white;
+        }
+        .btn-dismiss-danger {
+            border: 1px solid #991b1b;
+            color: #991b1b;
+        }
+        .btn-dismiss-danger:hover {
+            background: #991b1b;
+            color: white;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 
-    <div class="app-container" viewModel="@id('vm') @init('com.meetingroom.viewmodel.MainViewModel')">
-        <div class="header">
-            <h:h1>Meeting Room Booking System</h:h1>
-            <button label="Logout" onClick="@command('logout')" class="btn-logout"/>
-        </div>
+    <div class="app-layout" viewModel="@id('vm') @init('com.meetingroom.viewmodel.MainViewModel')">
+        <!-- Include Sidebar -->
+        <include src="sidebar.zul" />
 
-        <div class="card" if="${not empty vm.currentUser}">
-            <div class="profile-title">
-                <label value="Welcome back, "/>
-                <label value="@load(vm.currentUser.username)" style="color: #2563eb;"/>
-                <label value="!"/>
-            </div>
-
-            <div class="profile-row">
-                <div class="profile-label">User ID</div>
-                <div class="profile-value">
-                    <label value="@load(vm.currentUser.id)"/>
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <div class="header">
+                <div>
+                    <h:h1>System Dashboard</h:h1>
+                    <h:p style="color: #64748b; margin-top: 4px; margin-bottom: 0;">Welcome back, <label value="@load(vm.currentUser.username)" style="font-weight: 600; color: #2563eb;" />!</h:p>
                 </div>
             </div>
 
-            <div class="profile-row">
-                <div class="profile-label">Username</div>
-                <div class="profile-value">
-                    <label value="@load(vm.currentUser.username)"/>
+            <!-- Booking Status Notifications -->
+            <div children="@load(vm.unreadStatusUpdates)" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px;">
+                <template name="children" var="notif">
+                    <div sclass="@load(notif.status eq 'CONFIRMED' ? 'notification-banner banner-success' : 'notification-banner banner-danger')">
+                        <div class="notification-content">
+                            <span class="notification-icon"><label value="@load(notif.status eq 'CONFIRMED' ? '✅' : '❌')" /></span>
+                            <div style="flex: 1;">
+                                <h:p class="notification-text">
+                                    Your booking for <label value="@load(notif.room.name)" style="font-weight: 700; color: inherit;" /> on 
+                                    <label value="@load(notif.bookingDate)" style="font-weight: 700; color: inherit;" /> has been 
+                                    <label value="@load(notif.status)" style="font-weight: 700; color: inherit;" />.
+                                </h:p>
+                                <div visible="@load(notif.adminRemarks ne null and notif.adminRemarks ne '')" class="notification-remarks">
+                                    <label value="Admin Remarks: " style="font-weight: 600; color: inherit;" />
+                                    <label value="@load(notif.adminRemarks)" style="color: inherit;" />
+                                </div>
+                            </div>
+                        </div>
+                        <button label="Dismiss" onClick="@command('dismissNotification', booking=notif)" sclass="@load(notif.status eq 'CONFIRMED' ? 'btn-dismiss btn-dismiss-success' : 'btn-dismiss btn-dismiss-danger')" />
+                    </div>
+                </template>
+            </div>
+
+            <!-- EMPLOYEE DASHBOARD PANEL -->
+            <div if="${vm.currentUser.role == 'EMPLOYEE'}" style="margin-top: 20px;">
+                <div class="dashboard-grid">
+                    <div class="action-card">
+                        <h:h3 class="action-title">Book a Meeting Room</h:h3>
+                        <h:p class="action-desc">Check room availability for any date and time, and book slots instantly.</h:p>
+                        <button label="Book Room" onClick="Executions.sendRedirect(&quot;book_room.zul&quot;)" class="btn-primary" style="margin-top: 10px;"/>
+                    </div>
+                    <div class="action-card">
+                        <h:h3 class="action-title">My Bookings</h:h3>
+                        <h:p class="action-desc">View and manage your active and past reservations.</h:p>
+                        <button label="View Reservations" class="btn-secondary" style="margin-top: 10px;" onClick="Executions.sendRedirect(&quot;my_bookings.zul&quot;)"/>
+                    </div>
+                </div>
+                <div class="card" style="margin-top: 24px; padding: 24px;" visible="@load(not empty vm.upcomingBookings)">
+                    <h:h3 class="panel-subtitle">Upcoming Reservations</h:h3>
+                    <listbox model="@load(vm.upcomingBookings)" emptyMessage="No upcoming reservations found.">
+                        <listhead>
+                            <listheader label="Room Name" width="25%"/>
+                            <listheader label="Date" width="20%"/>
+                            <listheader label="Time" width="30%"/>
+                            <listheader label="Purpose" width="15%"/>
+                            <listheader label="Action" width="10%"/>
+                        </listhead>
+                        <template name="model" var="booking">
+                            <listitem>
+                                <listcell><label value="@load(booking.room.name)" style="font-weight:bold;"/></listcell>
+                                <listcell><label value="@load(booking.bookingDate)"/></listcell>
+                                <listcell>
+                                    <label value="@load(booking.startTime)"/> - <label value="@load(booking.endTime)"/>
+                                </listcell>
+                                <listcell><label value="@load(booking.purpose)"/></listcell>
+                                <listcell>
+                                    <button label="Cancel" onClick="@command('cancelBookingFromDashboard', id=booking.id)" class="btn-cancel" style="padding: 6px 12px; font-size: 0.85rem;"/>
+                                </listcell>
+                            </listitem>
+                        </template>
+                    </listbox>
                 </div>
             </div>
 
-            <div class="profile-row">
-                <div class="profile-label">Email Address</div>
-                <div class="profile-value">
-                    <label value="@load(vm.currentUser.email)"/>
+            <!-- ADMIN DASHBOARD PANEL -->
+            <div if="${vm.currentUser.role == 'ADMIN'}" style="margin-top: 20px;">
+                <div class="dashboard-grid">
+                    <div class="action-card">
+                        <h:h3 class="action-title">Manage Rooms</h:h3>
+                        <h:p class="action-desc">Add new meeting rooms, update room details, or remove rooms from inventory.</h:p>
+                        <button label="Go to Console" onClick="Executions.sendRedirect(&quot;room_manage.zul&quot;)" class="btn-primary" style="margin-top: 10px;"/>
+                    </div>
+                    <div class="action-card">
+                        <h:h3 class="action-title">System Bookings</h:h3>
+                        <h:p class="action-desc">Monitor all user bookings, schedules, and active reservations across all rooms.</h:p>
+                        <button label="View All Schedules" class="btn-secondary" style="margin-top: 10px;" onClick='Executions.sendRedirect("admin_bookings.zul")'/>
+                    </div>
+                    <div class="action-card">
+                        <h:h3 class="action-title">User Accounts</h:h3>
+                        <h:p class="action-desc">Manage employee registration, view profiles, and update roles/permissions.</h:p>
+                        <button label="Manage Users" class="btn-secondary" style="margin-top: 10px;" onClick='alert("User Accounts Management console is coming soon!")'/>
+                    </div>
                 </div>
-            </div>
-
-            <div class="profile-row">
-                <div class="profile-label">Assigned Role</div>
-                <div class="profile-value">
-                    <label value="@load(vm.currentUser.role)" style="text-transform: uppercase; color: #4f46e5;"/>
-                </div>
-            </div>
-        </div>
-
-        <!-- EMPLOYEE DASHBOARD PANEL -->
-        <div if="${vm.currentUser.role == 'EMPLOYEE'}" style="margin-top: 30px;">
-            <div class="dashboard-grid">
-                <div class="action-card">
-                    <h:h3 class="action-title">Book a Meeting Room</h:h3>
-                    <h:p class="action-desc">Check room availability for any date and time, and book slots instantly.</h:p>
-                    <button label="Book Room" onClick="Executions.sendRedirect(&quot;book_room.zul&quot;)" class="btn-primary" style="margin-top: 10px;"/>
-                </div>
-                <div class="action-card">
-                    <h:h3 class="action-title">My Bookings</h:h3>
-                    <h:p class="action-desc">View and manage your active and past reservations.</h:p>
-                    <button label="View Reservations" class="btn-secondary" style="margin-top: 10px;" onClick="Executions.sendRedirect(&quot;my_bookings.zul&quot;)"/>
-                </div>
-            </div>
-            <div class="card" style="margin-top: 24px; padding: 24px;" visible="@load(not empty vm.upcomingBookings)">
-                <h:h3 class="panel-subtitle">Upcoming Reservations</h:h3>
-                <listbox model="@load(vm.upcomingBookings)" emptyMessage="No upcoming reservations found.">
-                    <listhead>
-                        <listheader label="Room Name" width="25%"/>
-                        <listheader label="Date" width="20%"/>
-                        <listheader label="Time" width="30%"/>
-                        <listheader label="Purpose" width="15%"/>
-                        <listheader label="Action" width="10%"/>
-                    </listhead>
-                    <template name="model" var="booking">
-                        <listitem>
-                            <listcell><label value="@load(booking.room.name)" style="font-weight:bold;"/></listcell>
-                            <listcell><label value="@load(booking.bookingDate)"/></listcell>
-                            <listcell>
-                                <label value="@load(booking.startTime)"/> - <label value="@load(booking.endTime)"/>
-                            </listcell>
-                            <listcell><label value="@load(booking.purpose)"/></listcell>
-                            <listcell>
-                                <button label="Cancel" onClick="@command('cancelBookingFromDashboard', id=booking.id)" class="btn-cancel" style="padding: 6px 12px; font-size: 0.85rem;"/>
-                            </listcell>
-                        </listitem>
-                    </template>
-                </listbox>
-            </div>
-        </div>
-
-        <!-- ADMIN DASHBOARD PANEL -->
-        <div if="${vm.currentUser.role == 'ADMIN'}" style="margin-top: 30px;">
-            <div class="dashboard-grid">
-                <div class="action-card">
-                    <h:h3 class="action-title">Manage Rooms</h:h3>
-                    <h:p class="action-desc">Add new meeting rooms, update room details, or remove rooms from inventory.</h:p>
-                    <button label="Go to Console" onClick="Executions.sendRedirect(&quot;room_manage.zul&quot;)" class="btn-primary" style="margin-top: 10px;"/>
-                </div>
-                <div class="action-card">
-                    <h:h3 class="action-title">System Bookings</h:h3>
-                    <h:p class="action-desc">Monitor all user bookings, schedules, and active reservations across all rooms.</h:p>
-                    <button label="View All Schedules" class="btn-secondary" style="margin-top: 10px;" onClick='Executions.sendRedirect("admin_bookings.zul")'/>
-                </div>
-                <div class="action-card">
-                    <h:h3 class="action-title">User Accounts</h:h3>
-                    <h:p class="action-desc">Manage employee registration, view profiles, and update roles/permissions.</h:p>
-                    <button label="Manage Users" class="btn-secondary" style="margin-top: 10px;" onClick='alert("User Accounts Management console is coming soon!")'/>
-                </div>
-
             </div>
         </div>
     </div>

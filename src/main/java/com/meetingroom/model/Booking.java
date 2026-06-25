@@ -42,4 +42,11 @@ public class Booking {
 
     @Column(name = "status", nullable = false)
     private String status;
+
+    @Column(name = "admin_remarks")
+    private String adminRemarks;
+
+    @Column(name = "notification_read", nullable = false)
+    @Builder.Default
+    private boolean notificationRead = true;
 }

@@ -9,10 +9,16 @@
             margin: 0;
             padding: 0;
         }
-        .container {
-            max-width: 1100px;
-            margin: 40px auto;
-            padding: 20px;
+        .app-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+        .main-content {
+            margin-left: 260px;
+            padding: 40px;
+            flex: 1;
+            background: #f8fafc;
+            box-sizing: border-box;
         }
         .header {
             margin-bottom: 24px;
@@ -220,14 +226,18 @@
         }
     </style>
 
-    <div class="container" viewModel="@id('vm') @init('com.meetingroom.viewmodel.AdminBookingsViewModel')">
-        <div class="header">
-            <div>
-                <h:h1>System Bookings</h:h1>
-                <h:p style="color: #64748b; margin-top: 4px; margin-bottom: 0;">Manage and review all employee bookings system-wide</h:p>
+    <div class="app-layout" viewModel="@id('vm') @init('com.meetingroom.viewmodel.AdminBookingsViewModel')">
+        <!-- Include Sidebar -->
+        <include src="sidebar.zul" />
+
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <div class="header">
+                <div>
+                    <h:h1>System Bookings</h:h1>
+                    <h:p style="color: #64748b; margin-top: 4px; margin-bottom: 0;">Manage and review all employee bookings system-wide</h:p>
+                </div>
             </div>
-            <button label="Back to Home" sclass="btn-back" onClick='Executions.sendRedirect("index.zul")' />
-        </div>
 
         <!-- Dashboard Stats Row -->
         <div class="stats-container">
@@ -321,15 +331,43 @@
                             <button label="Confirm" 
                                     sclass="btn-table-approve" 
                                     visible="@load(booking.status ne 'CONFIRMED')" 
-                                    onClick="@command('approveBooking', booking=booking)" />
+                                    onClick="@command('openRemarksDialog', booking=booking, status='CONFIRMED')" />
                             <button label="Cancel" 
                                     sclass="btn-table-cancel" 
                                     visible="@load(booking.status eq 'CONFIRMED')" 
-                                    onClick="@command('cancelBooking', booking=booking)" />
+                                    onClick="@command('openRemarksDialog', booking=booking, status='CANCELLED')" />
                         </hlayout>
                     </listcell>
                 </listitem>
             </template>
         </listbox>
+
+        <!-- Modal Dialog for Remarks/Reason -->
+        <window title="@load(vm.dialogTitle)" mode="modal" border="normal" width="440px"
+                visible="@load(vm.remarksDialogOpen)" onClose="@command('closeRemarksDialog')"
+                style="border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);">
+            <vlayout spacing="16px" style="padding: 20px;">
+                <hlayout spacing="6px">
+                    <label value="Room: " style="color: #64748b; font-weight: 600;" />
+                    <label value="@load(vm.selectedBooking ne null ? vm.selectedBooking.room.name : '')" style="font-weight: 700; color: #0f172a;" />
+                </hlayout>
+                <hlayout spacing="6px">
+                    <label value="User: " style="color: #64748b; font-weight: 600;" />
+                    <label value="@load(vm.selectedBooking ne null ? vm.selectedBooking.user.username : '')" style="font-weight: 700; color: #0f172a;" />
+                </hlayout>
+                <vlayout spacing="6px">
+                    <label value="Reason / Remarks:" style="font-weight: 600; color: #334155; font-size: 0.9rem;" />
+                    <textbox value="@bind(vm.remarksText)" rows="4" placeholder="Enter the reason or remarks for updating status..."
+                             style="width: 100%; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px; font-family: inherit; font-size: 0.9rem; box-sizing: border-box;" />
+                </vlayout>
+                <hlayout style="width: 100%; justify-content: flex-end;" spacing="10px">
+                    <button label="Cancel" onClick="@command('closeRemarksDialog')"
+                            style="background: #f1f5f9; border: 1px solid #cbd5e1; color: #475569; border-radius: 8px; padding: 8px 16px; cursor: pointer; font-weight: 600; font-size: 0.85rem;" />
+                    <button label="Submit" onClick="@command('submitStatusUpdate')"
+                            style="background: #2563eb; border: none; color: white; border-radius: 8px; padding: 8px 16px; cursor: pointer; font-weight: 600; font-size: 0.85rem;" />
+                </hlayout>
+            </vlayout>
+        </window>
+        </div>
     </div>
 </zk>

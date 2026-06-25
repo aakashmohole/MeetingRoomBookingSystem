@@ -12,6 +12,8 @@ import org.zkoss.zk.ui.Sessions;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -19,6 +21,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
+@Slf4j
 public class MainViewModel {
 
     @WireVariable
@@ -26,6 +29,7 @@ public class MainViewModel {
 
     private User currentUser;
     private List<Booking> upcomingBookings = new ArrayList<>();
+    private List<Booking> unreadStatusUpdates = new ArrayList<>();
 
     @Init
     public void init() {
@@ -35,6 +39,7 @@ public class MainViewModel {
             return;
         }
         loadUpcomingBookings();
+        loadUnreadStatusUpdates();
     }
 
     private void loadUpcomingBookings() {
@@ -50,12 +55,34 @@ public class MainViewModel {
         }
     }
 
+    private void loadUnreadStatusUpdates() {
+        if (currentUser != null && "EMPLOYEE".equals(currentUser.getRole())) {
+            List<Booking> allUserBookings = bookingService.getBookingsByUser(currentUser.getId());
+            unreadStatusUpdates = allUserBookings.stream()
+                    .filter(b -> !b.isNotificationRead())
+                    .collect(Collectors.toList());
+        }
+    }
+
     @Command
     @NotifyChange("upcomingBookings")
     public void cancelBookingFromDashboard(@org.zkoss.bind.annotation.BindingParam("id") Long id) {
         bookingService.cancelBooking(id);
         loadUpcomingBookings();
         ToastUtil.success("Booking cancelled successfully.");
+    }
+
+    @Command
+    @NotifyChange("unreadStatusUpdates")
+    public void dismissNotification(@org.zkoss.bind.annotation.BindingParam("booking") Booking booking) {
+        if (booking == null) return;
+        try {
+            booking.setNotificationRead(true);
+            bookingService.updateBooking(booking);
+            loadUnreadStatusUpdates();
+        } catch (Exception e) {
+            log.error("Failed to dismiss notification", e);
+        }
     }
 
     @Command
@@ -71,5 +98,9 @@ public class MainViewModel {
 
     public List<Booking> getUpcomingBookings() {
         return upcomingBookings;
+    }
+
+    public List<Booking> getUnreadStatusUpdates() {
+        return unreadStatusUpdates;
     }
 }
