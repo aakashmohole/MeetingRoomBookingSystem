@@ -2,6 +2,7 @@ package com.meetingroom.viewmodel;
 
 import com.meetingroom.model.Booking;
 import com.meetingroom.model.User;
+import com.meetingroom.service.BookingExportService;
 import com.meetingroom.service.BookingService;
 import com.meetingroom.util.ToastUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,17 @@ public class MyBookingsViewModel {
 
     @WireVariable
     private BookingService bookingService;
+
+    @WireVariable
+    private BookingExportService bookingExportService;
+
+    private boolean exportDialogOpen = false;
+    private String exportScope = "ALL";
+    private Date exportStartDate;
+    private Date exportEndDate;
+    private String exportFormat = "EXCEL";
+
+
 
     private User currentUser;
     private List<Booking> allBookings = new ArrayList<>();
@@ -139,6 +151,106 @@ public class MyBookingsViewModel {
         }
     }
 
+    @Command
+    @NotifyChange("exportDialogOpen")
+    public void openExportDialog() {
+        this.exportScope = "ALL";
+        this.exportStartDate = null;
+        this.exportEndDate = null;
+        this.exportFormat = "EXCEL";
+        this.exportDialogOpen = true;
+    }
+
+    @Command
+    @NotifyChange("exportDialogOpen")
+    public void closeExportDialog() {
+        this.exportDialogOpen = false;
+    }
+
+    @Command
+    @NotifyChange({"exportDialogOpen", "exportScope"})
+    public void changeExportScope() {
+        // Triggers UI updates
+    }
+
+
+    @Command
+    @NotifyChange("exportDialogOpen")
+    public void performExport(){
+        List<Booking> bookingsToExport;
+        String fileName = "";
+        switch (exportScope){
+            case "FILTERED":
+                bookingsToExport = new ArrayList<>(filteredBookings);
+                break;
+            case "RANGE":
+                if (exportStartDate == null || exportEndDate == null) {
+                    ToastUtil.error("Please select both Start and End Dates.");
+                    return;
+                }
+                if (exportStartDate.after(exportEndDate)) {
+                    ToastUtil.error("Start Date cannot be after End Date.");
+                    return;
+                }
+
+                LocalDate start = exportStartDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                LocalDate end = exportEndDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+                // Filter allBookings in-memory for security and efficiency
+                bookingsToExport = allBookings.stream()
+                        .filter(b -> !b.getBookingDate().isBefore(start) && !b.getBookingDate().isAfter(end))
+                        .collect(Collectors.toList());
+                break;
+            case "ALL":
+            default:
+                bookingsToExport = new ArrayList<>(allBookings);
+                break;
+        }
+
+        if (bookingsToExport.isEmpty()) {
+            ToastUtil.error("No bookings found in the selected range to export.");
+            return;
+        }
+
+        try {
+            byte[] fileData = null;
+            fileName = "my_bookings_" + System.currentTimeMillis();
+            String contentType = "";
+
+            switch (exportFormat) {
+                case "EXCEL":
+                    fileData = bookingExportService.exportToExcel(bookingsToExport);
+                    fileName += ".xlsx";
+                    contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+                    break;
+                case "PDF":
+                    fileData = bookingExportService.exportToPdf(bookingsToExport);
+                    fileName += ".pdf";
+                    contentType = "application/pdf";
+                    break;
+                case "XML":
+                    fileData = bookingExportService.exportToXml(bookingsToExport);
+                    fileName += ".xml";
+                    contentType = "text/xml";
+                    break;
+                default:
+                    ToastUtil.error("Invalid export format.");
+                    return;
+            }
+
+            if (fileData != null) {
+                org.zkoss.zul.Filedownload.save(fileData, contentType, fileName);
+                this.exportDialogOpen = false;
+                ToastUtil.success("Export successful! Download started.");
+            }
+        } catch (Exception e) {
+            log.error("Error occurred while exporting user bookings", e);
+            ToastUtil.error("An error occurred during export: " + e.getMessage());
+        }
+
+    }
+
+
     public List<com.meetingroom.model.BookingInvitee> getInvitations() {
         return invitations;
     }
@@ -153,5 +265,46 @@ public class MyBookingsViewModel {
     public String getSelectedStatus() { return selectedStatus; }
     public void setSelectedStatus(String selectedStatus) { this.selectedStatus = selectedStatus; }
     public Date getFilterDate() { return filterDate; }
+
+    public void setExportDialogOpen(boolean exportDialogOpen) {
+        this.exportDialogOpen = exportDialogOpen;
+    }
+
+    public boolean isExportDialogOpen() {
+        return exportDialogOpen;
+    }
+
+    public String getExportScope() {
+        return exportScope;
+    }
+
+    public Date getExportStartDate() {
+        return exportStartDate;
+    }
+
+    public Date getExportEndDate() {
+        return exportEndDate;
+    }
+
+    public String getExportFormat() {
+        return exportFormat;
+    }
+
+    public void setExportScope(String exportScope) {
+        this.exportScope = exportScope;
+    }
+
+    public void setExportStartDate(Date exportStartDate) {
+        this.exportStartDate = exportStartDate;
+    }
+
+    public void setExportEndDate(Date exportEndDate) {
+        this.exportEndDate = exportEndDate;
+    }
+
+    public void setExportFormat(String exportFormat) {
+        this.exportFormat = exportFormat;
+    }
+
     public void setFilterDate(Date filterDate) { this.filterDate = filterDate; }
 }
