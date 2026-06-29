@@ -2,6 +2,7 @@ package com.meetingroom.dao;
 
 
 import com.meetingroom.model.Booking;
+import com.meetingroom.model.BookingInvitee;
 import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -83,5 +84,45 @@ public class BookingDaoImpl implements BookingDao {
 
         Long count = query.uniqueResult();
         return count != null && count > 0;
+    }
+
+    @Override
+    public void cancelRecurringSeries(String recurrenceId) {
+        if (recurrenceId == null || recurrenceId.isEmpty()) return;
+        sessionFactory.getCurrentSession()
+                .createQuery("update Booking b set b.status = 'CANCELLED' where b.recurrenceId = :recurrenceId")
+                .setParameter("recurrenceId", recurrenceId)
+                .executeUpdate();
+    }
+
+    @Override
+    public void saveInvitee(BookingInvitee invitee) {
+        sessionFactory.getCurrentSession().save(invitee);
+    }
+
+    @Override
+    public void updateInvitee(BookingInvitee invitee) {
+        sessionFactory.getCurrentSession().update(invitee);
+    }
+
+    @Override
+    public List<BookingInvitee> findInviteesByUser(Long userId) {
+        return sessionFactory.getCurrentSession()
+                .createQuery("from BookingInvitee where user.id = :userId order by booking.bookingDate desc, booking.startTime desc", BookingInvitee.class)
+                .setParameter("userId", userId)
+                .list();
+    }
+
+    @Override
+    public BookingInvitee findInviteeByBookingAndUser(Long bookingId, Long userId) {
+        try {
+            return sessionFactory.getCurrentSession()
+                    .createQuery("from BookingInvitee where booking.id = :bookingId and user.id = :userId", BookingInvitee.class)
+                    .setParameter("bookingId", bookingId)
+                    .setParameter("userId", userId)
+                    .uniqueResult();
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

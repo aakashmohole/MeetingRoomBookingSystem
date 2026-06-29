@@ -7,4 +7,5 @@ public interface UserService {
     User login(String username, String password);
     boolean isUsernameExists(String username);
     boolean isEmailExists(String email);
+    java.util.List<User> getAllUsersExcept(Long currentUserId);
 }

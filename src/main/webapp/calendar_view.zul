@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul"
+    xmlns:h="http://www.w3.org/1999/xhtml">
+    <style>
+        body {
+            background-color: #f8fafc;
+            color: #0f172a;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .app-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+        .main-content {
+            margin-left: 260px;
+            padding: 40px;
+            flex: 1;
+            background: #f8fafc;
+            box-sizing: border-box;
+        }
+        .header {
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0;
+        }
+        .calendar-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+        .filter-panel {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .filter-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #475569;
+        }
+        .filter-select {
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            color: #0f172a;
+        }
+        /* FullCalendar Custom Premium Styling overrides */
+        .fc {
+            font-family: inherit;
+        }
+        .fc-theme-standard td, .fc-theme-standard th {
+            border-color: #f1f5f9;
+        }
+        .fc .fc-toolbar-title {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: #0f172a;
+        }
+        .fc .fc-button-primary {
+            background-color: #ffffff;
+            border-color: #cbd5e1;
+            color: #475569;
+            font-weight: 600;
+            font-size: 0.9rem;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            text-transform: capitalize;
+            padding: 6px 12px;
+            border-radius: 8px;
+        }
+        .fc .fc-button-primary:hover {
+            background-color: #f8fafc;
+            border-color: #cbd5e1;
+            color: #0f172a;
+        }
+        .fc .fc-button-primary:disabled {
+            background-color: #f1f5f9;
+            border-color: #e2e8f0;
+            color: #cbd5e1;
+        }
+        .fc .fc-button-primary:not(:disabled).fc-button-active, 
+        .fc .fc-button-primary:not(:disabled):active {
+            background-color: #2563eb;
+            border-color: #2563eb;
+            color: #ffffff;
+        }
+        .fc-event {
+            border-radius: 6px !important;
+            padding: 4px 8px !important;
+            font-size: 0.82rem !important;
+            font-weight: 600 !important;
+            border: none !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+            cursor: pointer;
+            transition: transform 0.15s ease;
+        }
+        .fc-event:hover {
+            transform: scale(1.02);
+            filter: brightness(0.95);
+        }
+        
+        /* Modal Badges */
+        .role-badge {
+            align-self: flex-start;
+            padding: 2px 8px;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .role-admin {
+            background: rgba(16, 185, 129, 0.15);
+            color: #059669;
+        }
+        .role-employee {
+            background: rgba(239, 68, 68, 0.15);
+            color: #dc2626;
+        }
+    </style>
+
+    <!-- Load FullCalendar dependencies from CDN -->
+    <style src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js" />
+
+    <div class="app-layout" viewModel="@id('vm') @init('com.meetingroom.viewmodel.CalendarViewModel')">
+        <!-- Include Sidebar -->
+        <include src="sidebar.zul" />
+
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <div class="header">
+                <div>
+                    <h:h1>Booking Calendar</h:h1>
+                    <h:p style="color: #64748b; margin-top: 4px; margin-bottom: 0;">Interactive scheduling view across all meeting rooms</h:p>
+                </div>
+            </div>
+
+            <div class="calendar-card">
+                <!-- Room Filter -->
+                <div class="filter-panel">
+                    <label value="Filter by Room:" sclass="filter-label" />
+                    <listbox mold="select" sclass="filter-select" 
+                             selectedItem="@bind(vm.selectedRoomId)" 
+                             onSelect="@command('applyFilter')">
+                        <listitem label="All Rooms" value="-1" />
+                        <template name="model" var="room">
+                            <listitem label="@load(room.name)" value="@load(room.id)" />
+                        </template>
+                    </listbox>
+                </div>
+
+                <!-- Hidden variables for JS communication -->
+                <textbox id="hiddenBookingId" value="" style="display:none;" />
+                <textbox id="eventsData" value="@load(vm.eventsJson)" style="display:none;" />
+                <button id="hiddenTriggerBtn" style="display:none;" onClick="@command('openDetails', bookingId=hiddenBookingId.value)" />
+
+                <!-- Calendar target element -->
+                <div id="calendar-container" style="min-height: 600px;">
+                    <h:div id="calendar"></h:div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Booking Details Modal Window -->
+        <window title="Reservation Details" mode="modal" border="normal" width="450px"
+                visible="@load(vm.detailsModalOpen)" onClose="@command('closeDetails')"
+                style="border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);">
+            <vlayout spacing="16px" style="padding: 20px;" if="${vm.selectedBooking ne null}">
+                <hlayout spacing="8px" style="align-items: center;">
+                    <label value="@load(vm.selectedBooking.room.name)" style="font-size: 1.3rem; font-weight: 800; color: #0f172a;" />
+                    <div sclass="@load(vm.selectedBooking.status eq 'CONFIRMED' ? 'role-badge role-admin' : 'role-badge role-employee')">
+                        <label value="@load(vm.selectedBooking.status)" />
+                    </div>
+                </hlayout>
+                
+                <h:hr style="border: 0; border-top: 1px solid #f1f5f9; margin: 0;"/>
+
+                <grid oddRowSclass="none" style="border: none;">
+                    <columns>
+                        <column width="120px" />
+                        <column />
+                    </columns>
+                    <rows>
+                        <row style="background: transparent; border: none; padding: 6px 0;">
+                            <label value="Reserved By:" style="color: #64748b; font-weight: 500;" />
+                            <vlayout spacing="2px">
+                                <label value="@load(vm.selectedBooking.user.username)" style="font-weight: 600; color: #0f172a;" />
+                                <label value="@load(vm.selectedBooking.user.email)" style="font-size: 0.8rem; color: #64748b;" />
+                            </vlayout>
+                        </row>
+                        <row style="background: transparent; border: none; padding: 6px 0;">
+                            <label value="Date:" style="color: #64748b; font-weight: 500;" />
+                            <label value="@load(vm.selectedBooking.bookingDate)" style="font-weight: 600; color: #0f172a;" />
+                        </row>
+                        <row style="background: transparent; border: none; padding: 6px 0;">
+                            <label value="Time Slot:" style="color: #64748b; font-weight: 500;" />
+                            <hlayout spacing="4px">
+                                <label value="@load(vm.selectedBooking.startTime)" style="font-weight: 600; color: #0f172a;" />
+                                <label value="-" style="color: #64748b;" />
+                                <label value="@load(vm.selectedBooking.endTime)" style="font-weight: 600; color: #0f172a;" />
+                            </hlayout>
+                        </row>
+                        <row style="background: transparent; border: none; padding: 6px 0;">
+                            <label value="Purpose:" style="color: #64748b; font-weight: 500;" />
+                            <label value="@load(vm.selectedBooking.purpose)" style="color: #334155; font-weight: 500;" />
+                        </row>
+                        <row style="background: transparent; border: none; padding: 6px 0;" visible="@load(not empty vm.selectedBooking.invitees)">
+                            <label value="Invitees:" style="color: #64748b; font-weight: 500;" />
+                            <vlayout spacing="2px" children="@load(vm.selectedBooking.invitees)">
+                                <template name="children" var="inv">
+                                    <hlayout spacing="4px" style="align-items: center; margin-bottom: 2px;">
+                                        <label value="@load(inv.user.username)" style="font-size: 0.85rem; font-weight: 600; color: #0f172a;" />
+                                        <label value="@load(inv.status)" 
+                                               style="@load(inv.status eq 'ACCEPTED' ? 'font-size: 0.7rem; color: #059669; font-weight: 600; background: rgba(16, 185, 129, 0.08); padding: 1px 4px; border-radius: 4px;' : (inv.status eq 'DECLINED' ? 'font-size: 0.7rem; color: #dc2626; font-weight: 600; background: rgba(239, 68, 68, 0.08); padding: 1px 4px; border-radius: 4px;' : 'font-size: 0.7rem; color: #d97706; font-weight: 600; background: rgba(245, 158, 11, 0.08); padding: 1px 4px; border-radius: 4px;'))" />
+                                    </hlayout>
+                                </template>
+                            </vlayout>
+                        </row>
+                        <row style="background: transparent; border: none; padding: 6px 0;" visible="@load(not empty vm.selectedBooking.adminRemarks)">
+                            <label value="Remarks:" style="color: #64748b; font-weight: 500;" />
+                            <label value="@load(vm.selectedBooking.adminRemarks)" style="color: #b45309; font-style: italic; font-weight: 500;" />
+                        </row>
+                    </rows>
+                </grid>
+
+                <hlayout style="width: 100%; justify-content: flex-end; margin-top: 8px;">
+                    <button label="Close" onClick="@command('closeDetails')"
+                            style="background: #f1f5f9; border: 1px solid #cbd5e1; color: #475569; border-radius: 8px; padding: 8px 20px; cursor: pointer; font-weight: 600; font-size: 0.85rem;" />
+                </hlayout>
+            </vlayout>
+        </window>
+
+        <!-- Javascript initialization -->
+        <script defer="true"><![CDATA[
+            var calendarEl;
+            var calendar;
+
+            function initCalendar() {
+                if (typeof FullCalendar === 'undefined') {
+                    setTimeout(initCalendar, 50);
+                    return;
+                }
+                calendarEl = document.getElementById('calendar');
+                var tbData = zk.Widget.$('$eventsData');
+                if (!calendarEl || !tbData) {
+                    setTimeout(initCalendar, 50);
+                    return;
+                }
+
+                var rawEvents = [];
+                try {
+                    rawEvents = JSON.parse(tbData.getValue() || '[]');
+                } catch(e) {
+                    console.error("Failed to parse events JSON on startup", e);
+                }
+
+                calendar = new FullCalendar.Calendar(calendarEl, {
+                    initialView: 'dayGridMonth',
+                    headerToolbar: {
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                    },
+                    events: rawEvents,
+                    eventClick: function(info) {
+                        var tb = zk.Widget.$('$hiddenBookingId');
+                        if (tb) {
+                            tb.setValue(info.event.id);
+                            tb.fireOnChange();
+                            var btn = zk.Widget.$('$hiddenTriggerBtn');
+                            if (btn) {
+                                btn.fire('onClick');
+                            }
+                        }
+                    }
+                });
+                calendar.render();
+            }
+
+            initCalendar();
+
+            // Globally accessible event updating function called by server-side Java ViewModel
+            window.updateCalendarEvents = function(events) {
+                if (calendar) {
+                    calendar.removeAllEvents();
+                    calendar.addEventSource(events);
+                }
+            };
+        ]]></script>
+    </div>
+</zk>

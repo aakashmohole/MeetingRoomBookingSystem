@@ -31,9 +31,14 @@ public class EmployeeBookingViewModel {
     @WireVariable
     private BookingService bookingService;
 
+    @WireVariable
+    private com.meetingroom.service.UserService userService;
+
     private User currentUser;
     private List<Room> rooms;
     private List<Booking> myBookings;
+    private List<User> colleagues;
+    private java.util.Set<User> selectedColleagues = new java.util.HashSet<>();
 
     // Filter & Booking State variables
     private Room selectedRoom;
@@ -41,6 +46,10 @@ public class EmployeeBookingViewModel {
     private String startTime = "09:00";   // Bound to start time select (HH:mm)
     private String endTime = "10:00";     // Bound to end time select (HH:mm)
     private String purpose;
+
+    private boolean recurring = false;
+    private String recurrenceType = "DAILY";
+    private Date recurrenceEndDate;
 
     private String successMessage;
     private String errorMessage;
@@ -54,6 +63,7 @@ public class EmployeeBookingViewModel {
         }
         rooms = roomService.getAllRooms();
         myBookings = bookingService.getBookingsByUser(currentUser.getId());
+        colleagues = userService.getAllUsersExcept(currentUser.getId());
     }
 
     public boolean isRoomBusy(Room room) {
@@ -61,18 +71,37 @@ public class EmployeeBookingViewModel {
             return false;
         }
         try {
-            LocalDate date = selectDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            LocalDate startLocalDate = selectDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
             LocalTime start = LocalTime.parse(startTime);
             LocalTime end = LocalTime.parse(endTime);
             if (start.isAfter(end) || start.equals(end)) {
                 return false;
             }
-            List<Booking> roomBookings = bookingService.getBookingsByRoom(room.getId());
-            return roomBookings.stream()
-                    .anyMatch(b -> "CONFIRMED".equals(b.getStatus()) &&
-                            b.getBookingDate().isEqual(date) &&
-                            b.getStartTime().isBefore(end) &&
-                            b.getEndTime().isAfter(start));
+
+            if (recurring && recurrenceEndDate != null) {
+                LocalDate endLocalDate = recurrenceEndDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                if (endLocalDate.isBefore(startLocalDate)) {
+                    return false;
+                }
+
+                LocalDate current = startLocalDate;
+                while (!current.isAfter(endLocalDate)) {
+                    boolean conflict = bookingService.hasOverlap(room.getId(), current, start, end, null);
+                    if (conflict) {
+                        return true;
+                    }
+                    if ("DAILY".equalsIgnoreCase(recurrenceType)) {
+                        current = current.plusDays(1);
+                    } else if ("WEEKLY".equalsIgnoreCase(recurrenceType)) {
+                        current = current.plusWeeks(1);
+                    } else {
+                        break;
+                    }
+                }
+                return false;
+            } else {
+                return bookingService.hasOverlap(room.getId(), startLocalDate, start, end, null);
+            }
         } catch (Exception e) {
             log.error("Error checking room status", e);
             return false;
@@ -80,7 +109,7 @@ public class EmployeeBookingViewModel {
     }
 
     @Command
-    @NotifyChange({"rooms", "myBookings", "successMessage", "errorMessage", "purpose"})
+    @NotifyChange({"rooms", "myBookings", "successMessage", "errorMessage", "purpose", "recurring", "recurrenceEndDate", "selectedColleagues"})
     public void bookSelectedRoom(@BindingParam("room") Room room) {
         successMessage = null;
         errorMessage = null;
@@ -96,6 +125,22 @@ public class EmployeeBookingViewModel {
             return;
         }
 
+        LocalDate localEndDate = null;
+        if (recurring) {
+            if (recurrenceEndDate == null) {
+                errorMessage = "Please specify a recurrence end date.";
+                ToastUtil.warning("Please specify a recurrence end date.");
+                return;
+            }
+            localEndDate = recurrenceEndDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            LocalDate localStartDate = selectDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            if (localEndDate.isBefore(localStartDate)) {
+                errorMessage = "Recurrence end date cannot be before booking date.";
+                ToastUtil.warning("Recurrence end date cannot be before booking date.");
+                return;
+            }
+        }
+
         try {
             LocalDate date = selectDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
             LocalTime start = LocalTime.parse(startTime);
@@ -108,12 +153,25 @@ public class EmployeeBookingViewModel {
                     .startTime(start)
                     .endTime(end)
                     .purpose(purpose.trim())
+                    .recurrenceType(recurring ? recurrenceType.toUpperCase() : null)
                     .build();
 
-            bookingService.createBooking(booking);
-            successMessage = "Successfully booked room: " + room.getName();
-            ToastUtil.success("Successfully booked room: " + room.getName());
+            List<Long> inviteeUserIds = new java.util.ArrayList<>();
+            if (selectedColleagues != null) {
+                for (User u : selectedColleagues) {
+                    inviteeUserIds.add(u.getId());
+                }
+            }
+
+            bookingService.createBooking(booking, localEndDate, inviteeUserIds);
+            successMessage = "Successfully booked room: " + room.getName() + (recurring ? " (Recurring)" : "");
+            ToastUtil.success(successMessage);
             purpose = ""; // Clear input
+            recurring = false;
+            recurrenceEndDate = null;
+            if (selectedColleagues != null) {
+                selectedColleagues.clear();
+            }
             myBookings = bookingService.getBookingsByUser(currentUser.getId());
         } catch (Exception e) {
             errorMessage = e.getMessage();
@@ -173,6 +231,50 @@ public class EmployeeBookingViewModel {
 
     public void setPurpose(String purpose) {
         this.purpose = purpose;
+    }
+
+    public boolean isRecurring() {
+        return recurring;
+    }
+
+    @NotifyChange("rooms")
+    public void setRecurring(boolean recurring) {
+        this.recurring = recurring;
+    }
+
+    public String getRecurrenceType() {
+        return recurrenceType;
+    }
+
+    @NotifyChange("rooms")
+    public void setRecurrenceType(String recurrenceType) {
+        this.recurrenceType = recurrenceType;
+    }
+
+    public Date getRecurrenceEndDate() {
+        return recurrenceEndDate;
+    }
+
+    @NotifyChange("rooms")
+    public void setRecurrenceEndDate(Date recurrenceEndDate) {
+        this.recurrenceEndDate = recurrenceEndDate;
+    }
+
+    public List<User> getColleagues() {
+        return colleagues;
+    }
+
+    public void setColleagues(List<User> colleagues) {
+        this.colleagues = colleagues;
+    }
+
+    public java.util.Set<User> getSelectedColleagues() {
+        return selectedColleagues;
+    }
+
+    @NotifyChange("rooms")
+    public void setSelectedColleagues(java.util.Set<User> selectedColleagues) {
+        this.selectedColleagues = selectedColleagues;
     }
 
     public String getSuccessMessage() {

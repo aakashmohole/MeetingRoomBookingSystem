@@ -21,6 +21,11 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
+    public User findById(Long id) {
+        return sessionFactory.getCurrentSession().get(User.class, id);
+    }
+
+    @Override
     public User findByUsername(String username) {
         return sessionFactory.getCurrentSession()
                 .createQuery("from User where username = :username", User.class)
@@ -34,5 +39,12 @@ public class UserDaoImpl implements UserDao {
                 .createQuery("from User where email = :email", User.class)
                 .setParameter("email", email)
                 .uniqueResult();
+    }
+
+    @Override
+    public java.util.List<User> findAll() {
+        return sessionFactory.getCurrentSession()
+                .createQuery("from User order by username", User.class)
+                .list();
     }
 }

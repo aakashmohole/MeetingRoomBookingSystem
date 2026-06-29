@@ -31,6 +31,7 @@ public class MyBookingsViewModel {
     private User currentUser;
     private List<Booking> allBookings = new ArrayList<>();
     private List<Booking> filteredBookings = new ArrayList<>();
+    private List<com.meetingroom.model.BookingInvitee> invitations = new ArrayList<>();
 
     // Stats
     private int totalBookings = 0;
@@ -54,6 +55,7 @@ public class MyBookingsViewModel {
 
     private void loadData() {
         allBookings = bookingService.getBookingsByUser(currentUser.getId());
+        invitations = bookingService.getInvitationsForUser(currentUser.getId());
         calculateStats();
         applyFilters();
     }
@@ -111,6 +113,34 @@ public class MyBookingsViewModel {
         } catch (Exception e) {
             ToastUtil.error("Failed to cancel booking: " + e.getMessage());
         }
+    }
+
+    @Command
+    @NotifyChange({"filteredBookings", "totalBookings", "activeBookings", "cancelledBookings"})
+    public void cancelSeries(@BindingParam("recurrenceId") String recurrenceId) {
+        try {
+            bookingService.cancelRecurringSeries(recurrenceId);
+            ToastUtil.success("Entire recurring series cancelled successfully.");
+            loadData();
+        } catch (Exception e) {
+            ToastUtil.error("Failed to cancel series: " + e.getMessage());
+        }
+    }
+
+    @Command
+    @NotifyChange({"invitations", "filteredBookings", "totalBookings", "activeBookings", "cancelledBookings"})
+    public void respondToInvite(@BindingParam("bookingId") Long bookingId, @BindingParam("status") String status) {
+        try {
+            bookingService.respondToInvitation(bookingId, currentUser.getId(), status);
+            ToastUtil.success("RSVP status updated to " + status + ".");
+            loadData();
+        } catch (Exception e) {
+            ToastUtil.error("Failed to respond to invitation: " + e.getMessage());
+        }
+    }
+
+    public List<com.meetingroom.model.BookingInvitee> getInvitations() {
+        return invitations;
     }
 
     // Getters and Setters

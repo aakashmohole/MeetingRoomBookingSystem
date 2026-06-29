@@ -31,7 +31,18 @@ CREATE TABLE IF NOT EXISTS bookings (
     status VARCHAR(20) NOT NULL DEFAULT 'CONFIRMED', -- 'CONFIRMED' or 'CANCELLED'
     admin_remarks VARCHAR(255),
     notification_read BOOLEAN NOT NULL DEFAULT TRUE,
+    recurrence_id VARCHAR(100) NULL,
+    recurrence_type VARCHAR(50) NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (room_id) REFERENCES rooms(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS booking_invitees (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    booking_id BIGINT NOT NULL,
+    user_id BIGINT NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
+    FOREIGN KEY (booking_id) REFERENCES bookings(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );

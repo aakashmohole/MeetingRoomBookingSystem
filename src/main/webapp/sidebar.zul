@@ -158,16 +158,13 @@
         <div class="sidebar-menu">
             <!-- Home / Dashboard (Visible to both) -->
             <button label="🏠 Dashboard" sclass="menu-item" onClick='Executions.sendRedirect("index.zul")' />
+            <button label="📅 Booking Calendar" sclass="menu-item" onClick='Executions.sendRedirect("calendar_view.zul")' style="margin-top: 8px;" />
+            <button label="📅 Book a Room" sclass="menu-item" onClick='Executions.sendRedirect("book_room.zul")' style="margin-top: 8px;" />
+            <button label="📁 My Reservations" sclass="menu-item" onClick='Executions.sendRedirect("my_bookings.zul")' style="margin-top: 8px;" />
 
-            <!-- Employee Views -->
-            <h:div if="${sessionScope.currentUser.role eq 'EMPLOYEE'}">
-                <button label="📅 Book a Room" sclass="menu-item" onClick='Executions.sendRedirect("book_room.zul")' />
-                <button label="📁 My Reservations" sclass="menu-item" onClick='Executions.sendRedirect("my_bookings.zul")' style="margin-top: 8px;" />
-            </h:div>
-
-            <!-- Admin Views -->
+            <!-- Admin Management Views -->
             <h:div if="${sessionScope.currentUser.role eq 'ADMIN'}">
-                <button label="🔧 Manage Rooms" sclass="menu-item" onClick='Executions.sendRedirect("room_manage.zul")' />
+                <button label="🔧 Manage Rooms" sclass="menu-item" onClick='Executions.sendRedirect("room_manage.zul")' style="margin-top: 8px;" />
                 <button label="📊 System Bookings" sclass="menu-item" onClick='Executions.sendRedirect("admin_bookings.zul")' style="margin-top: 8px;" />
             </h:div>
         </div>

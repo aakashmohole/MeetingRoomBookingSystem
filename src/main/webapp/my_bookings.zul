@@ -184,9 +184,34 @@
             background: transparent;
             border-bottom: 1px solid #e2e8f0;
         }
-        .z-listcell {
-            color: #334155;
-            padding: 14px;
+        .btn-rsvp-accept {
+            background: #10b981;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            padding: 6px 12px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-right: 6px;
+        }
+        .btn-rsvp-accept:hover {
+            background: #059669;
+        }
+        .btn-rsvp-decline {
+            background: #ef4444;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            padding: 6px 12px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-rsvp-decline:hover {
+            background: #dc2626;
         }
     </style>
 
@@ -225,6 +250,47 @@
             </div>
         </div>
 
+        <!-- 2. Colleague Invitations Inbox Card -->
+        <div class="card">
+            <h:h3 style="margin-top: 0; color: #0f172a; font-weight: 700; margin-bottom: 16px;">📩 Colleague Invitations Inbox</h:h3>
+            <listbox model="@load(vm.invitations)" emptyMessage="No invitations received.">
+                <listhead>
+                    <listheader label="Organizer" width="20%"/>
+                    <listheader label="Room Name" width="20%"/>
+                    <listheader label="Date" width="15%"/>
+                    <listheader label="Time Slot" width="15%"/>
+                    <listheader label="Purpose" width="18%"/>
+                    <listheader label="My RSVP" width="12%"/>
+                </listhead>
+                <template name="model" var="invite">
+                    <listitem>
+                        <listcell><label value="@load(invite.booking.user.username)" style="font-weight: bold;"/></listcell>
+                        <listcell><label value="@load(invite.booking.room.name)"/></listcell>
+                        <listcell><label value="@load(invite.booking.bookingDate)"/></listcell>
+                        <listcell>
+                            <hlayout spacing="4px">
+                                <label value="@load(invite.booking.startTime)"/>
+                                <label value="-"/>
+                                <label value="@load(invite.booking.endTime)"/>
+                            </hlayout>
+                        </listcell>
+                        <listcell><label value="@load(invite.booking.purpose)"/></listcell>
+                        <listcell>
+                            <!-- If status is PENDING, show RSVP options -->
+                            <hlayout spacing="4px" visible="@load(invite.status eq 'PENDING')">
+                                <button label="Accept" onClick="@command('respondToInvite', bookingId=invite.booking.id, status='ACCEPTED')" class="btn-rsvp-accept" />
+                                <button label="Decline" onClick="@command('respondToInvite', bookingId=invite.booking.id, status='DECLINED')" class="btn-rsvp-decline" />
+                            </hlayout>
+                            <!-- If not pending, show status label -->
+                            <label value="@load(invite.status)" 
+                                   style="@load(invite.status eq 'ACCEPTED' ? 'color: #059669; font-weight: 600;' : 'color: #dc2626; font-weight: 600;')" 
+                                   visible="@load(invite.status ne 'PENDING')"/>
+                        </listcell>
+                    </listitem>
+                </template>
+            </listbox>
+        </div>
+
         <!-- Search & Filter Card -->
         <div class="card">
             <h:h3 style="margin-top: 0; color: #0f172a; font-weight: 700; margin-bottom: 16px;">Search &amp; Filter Meetings</h:h3>
@@ -256,27 +322,55 @@
             <listbox model="@load(vm.filteredBookings)" emptyMessage="No bookings matched your search query.">
                 <listhead>
                     <listheader label="Room Name" width="20%"/>
-                    <listheader label="Booking Date" width="15%"/>
-                    <listheader label="Start Time" width="15%"/>
-                    <listheader label="End Time" width="15%"/>
-                    <listheader label="Purpose" width="20%"/>
+                    <listheader label="Booking Date" width="12%"/>
+                    <listheader label="Time Slot" width="14%"/>
+                    <listheader label="Purpose" width="16%"/>
+                    <listheader label="Invitees" width="18%"/>
                     <listheader label="Status" width="10%"/>
                     <listheader label="Action" width="10%"/>
                 </listhead>
                 <template name="model" var="booking">
                     <listitem>
-                        <listcell><label value="@load(booking.room.name)" style="font-weight: bold;"/></listcell>
+                        <listcell>
+                            <vlayout spacing="4px">
+                                <label value="@load(booking.room.name)" style="font-weight: bold;"/>
+                                <label value="@load(booking.recurrenceType eq 'DAILY' ? '🔄 Daily Series' : '🔄 Weekly Series')" 
+                                       style="font-size: 0.75rem; color: #3b82f6; font-weight: 600; background: rgba(59, 130, 246, 0.08); padding: 2px 6px; border-radius: 4px; display: inline-block; width: max-content;" 
+                                       visible="@load(not empty booking.recurrenceId)"/>
+                            </vlayout>
+                        </listcell>
                         <listcell><label value="@load(booking.bookingDate)"/></listcell>
-                        <listcell><label value="@load(booking.startTime)"/></listcell>
-                        <listcell><label value="@load(booking.endTime)"/></listcell>
+                        <listcell>
+                            <hlayout spacing="4px">
+                                <label value="@load(booking.startTime)"/>
+                                <label value="-"/>
+                                <label value="@load(booking.endTime)"/>
+                            </hlayout>
+                        </listcell>
                         <listcell><label value="@load(booking.purpose)"/></listcell>
+                        <listcell>
+                            <vlayout spacing="2px" children="@load(booking.invitees)">
+                                <template name="children" var="inv">
+                                    <hlayout spacing="4px" style="align-items: center; margin-bottom: 2px;">
+                                        <label value="@load(inv.user.username)" style="font-size: 0.85rem; font-weight: 500;" />
+                                        <label value="@load(inv.status)" 
+                                               style="@load(inv.status eq 'ACCEPTED' ? 'font-size: 0.7rem; color: #059669; font-weight: 600; background: rgba(16, 185, 129, 0.08); padding: 1px 4px; border-radius: 4px;' : (inv.status eq 'DECLINED' ? 'font-size: 0.7rem; color: #dc2626; font-weight: 600; background: rgba(239, 68, 68, 0.08); padding: 1px 4px; border-radius: 4px;' : 'font-size: 0.7rem; color: #d97706; font-weight: 600; background: rgba(245, 158, 11, 0.08); padding: 1px 4px; border-radius: 4px;'))" />
+                                    </hlayout>
+                                </template>
+                            </vlayout>
+                        </listcell>
                         <listcell>
                             <label value="@load(booking.status)"
                                    style="@load(booking.status eq 'CONFIRMED' ? 'color: #059669; font-weight: 600;' : 'color: #64748b; text-decoration: line-through;')"/>
                         </listcell>
                         <listcell>
-                            <button label="Cancel" onClick="@command('cancelBooking', id=booking.id)"
-                                    class="btn-cancel" if="${booking.status eq 'CONFIRMED'}"/>
+                            <vlayout spacing="4px" style="align-items: stretch;">
+                                <button label="Cancel" onClick="@command('cancelBooking', id=booking.id)"
+                                        class="btn-cancel" if="${booking.status eq 'CONFIRMED'}" style="width: 100%; text-align: center;"/>
+                                <button label="Cancel Series" onClick="@command('cancelSeries', recurrenceId=booking.recurrenceId)"
+                                        style="background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; color: #ef4444; border-radius: 8px; padding: 6px 12px; font-weight: 600; font-size: 0.75rem; cursor: pointer; width: 100%; text-align: center;" 
+                                        visible="@load(booking.status eq 'CONFIRMED' and not empty booking.recurrenceId)"/>
+                            </vlayout>
                         </listcell>
                     </listitem>
                 </template>

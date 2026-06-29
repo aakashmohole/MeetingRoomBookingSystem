@@ -282,19 +282,21 @@
                              onChange="@command('applyFilters')"/>
                 </div>
                 <button label="Reset Filters" sclass="btn-reset" onClick="@command('resetFilters')" />
+                <button label="Export" sclass="btn-reset" onClick="" />
             </div>
         </div>
 
         <!-- Bookings Listbox -->
         <listbox model="@load(vm.filteredBookings)" emptyMessage="No bookings matched your filter criteria.">
             <listhead>
-                <listheader label="User / Employee" width="22%" />
-                <listheader label="Room Name" width="18%" />
-                <listheader label="Date" width="14%" />
-                <listheader label="Time Slot" width="16%" />
-                <listheader label="Purpose" width="16%" />
+                <listheader label="User / Employee" width="18%" />
+                <listheader label="Room Name" width="16%" />
+                <listheader label="Date" width="11%" />
+                <listheader label="Time Slot" width="13%" />
+                <listheader label="Purpose" width="14%" />
+                <listheader label="Invitees" width="18%" />
                 <listheader label="Status" width="10%" />
-                <listheader label="Actions" width="8%" />
+                <listheader label="Actions" width="10%" />
             </listhead>
             <template name="model" var="booking">
                 <listitem>
@@ -305,7 +307,12 @@
                         </vlayout>
                     </listcell>
                     <listcell>
-                        <label value="@load(booking.room.name)" style="font-weight: 600;" />
+                        <vlayout spacing="4px">
+                            <label value="@load(booking.room.name)" style="font-weight: 600;" />
+                            <label value="@load(booking.recurrenceType eq 'DAILY' ? '🔄 Daily Series' : '🔄 Weekly Series')" 
+                                   style="font-size: 0.75rem; color: #3b82f6; font-weight: 600; background: rgba(59, 130, 246, 0.08); padding: 2px 6px; border-radius: 4px; display: inline-block; width: max-content;" 
+                                   visible="@load(not empty booking.recurrenceId)"/>
+                        </vlayout>
                     </listcell>
                     <listcell>
                         <label value="@load(booking.bookingDate)" />
@@ -321,22 +328,38 @@
                         <label value="@load(booking.purpose)" />
                     </listcell>
                     <listcell>
+                        <vlayout spacing="2px" children="@load(booking.invitees)">
+                            <template name="children" var="inv">
+                                <hlayout spacing="4px" style="align-items: center; margin-bottom: 2px;">
+                                    <label value="@load(inv.user.username)" style="font-size: 0.85rem; font-weight: 500;" />
+                                    <label value="@load(inv.status)" 
+                                           style="@load(inv.status eq 'ACCEPTED' ? 'font-size: 0.7rem; color: #059669; font-weight: 600; background: rgba(16, 185, 129, 0.08); padding: 1px 4px; border-radius: 4px;' : (inv.status eq 'DECLINED' ? 'font-size: 0.7rem; color: #dc2626; font-weight: 600; background: rgba(239, 68, 68, 0.08); padding: 1px 4px; border-radius: 4px;' : 'font-size: 0.7rem; color: #d97706; font-weight: 600; background: rgba(245, 158, 11, 0.08); padding: 1px 4px; border-radius: 4px;'))" />
+                                </hlayout>
+                            </template>
+                        </vlayout>
+                    </listcell>
+                    <listcell>
                         <div sclass="@load(booking.status eq 'CONFIRMED' ? 'status-badge badge-confirmed' : (booking.status eq 'CANCELLED' ? 'status-badge badge-cancelled' : 'status-badge badge-pending'))">
                             <label value="@load(booking.status)" />
                         </div>
                     </listcell>
                     <listcell>
                         <!-- Actions context-aware -->
-                        <hlayout spacing="6px">
-                            <button label="Confirm" 
-                                    sclass="btn-table-approve" 
-                                    visible="@load(booking.status ne 'CONFIRMED')" 
-                                    onClick="@command('openRemarksDialog', booking=booking, status='CONFIRMED')" />
-                            <button label="Cancel" 
-                                    sclass="btn-table-cancel" 
-                                    visible="@load(booking.status eq 'CONFIRMED')" 
-                                    onClick="@command('openRemarksDialog', booking=booking, status='CANCELLED')" />
-                        </hlayout>
+                        <vlayout spacing="4px" style="align-items: stretch;">
+                            <hlayout spacing="6px">
+                                <button label="Confirm" 
+                                        sclass="btn-table-approve" 
+                                        visible="@load(booking.status ne 'CONFIRMED')" 
+                                        onClick="@command('openRemarksDialog', booking=booking, status='CONFIRMED')" />
+                                <button label="Cancel" 
+                                        sclass="btn-table-cancel" 
+                                        visible="@load(booking.status eq 'CONFIRMED')" 
+                                        onClick="@command('openRemarksDialog', booking=booking, status='CANCELLED')" />
+                            </hlayout>
+                            <button label="Cancel Series" onClick="@command('cancelSeries', recurrenceId=booking.recurrenceId)"
+                                    style="background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; color: #ef4444; border-radius: 6px; padding: 6px 12px; font-weight: 600; font-size: 0.75rem; cursor: pointer; width: 100%; text-align: center;" 
+                                    visible="@load(booking.status eq 'CONFIRMED' and not empty booking.recurrenceId)"/>
+                        </vlayout>
                     </listcell>
                 </listitem>
             </template>

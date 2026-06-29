@@ -76,4 +76,12 @@ public class UserServiceImpl implements UserService {
         }
         return exists;
     }
+
+    @Override
+    public java.util.List<User> getAllUsersExcept(Long currentUserId) {
+        log.info("Fetching colleagues except User ID: {}", currentUserId);
+        return userDao.findAll().stream()
+                .filter(u -> !u.getId().equals(currentUserId))
+                .collect(java.util.stream.Collectors.toList());
+    }
 }

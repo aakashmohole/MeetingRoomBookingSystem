@@ -300,6 +300,35 @@
                 <h:label class="form-label">Purpose of Meeting</h:label>
                 <textbox value="@bind(vm.purpose)" class="form-input" placeholder="e.g. Sprint Planning, Project Review"/>
             </div>
+
+            <!-- Recurrence Setup -->
+            <div class="form-group" style="margin-top: 16px;">
+                <checkbox label="Make this a recurring booking" checked="@bind(vm.recurring)" style="font-weight: 600; color: #475569;" />
+            </div>
+
+            <div class="form-row" style="margin-top: 16px;" visible="@load(vm.recurring)">
+                <div class="form-item">
+                    <h:label class="form-label">Recurrence Pattern</h:label>
+                    <listbox mold="select" selectedItem="@bind(vm.recurrenceType)" class="form-input">
+                        <listitem label="Daily" value="DAILY" selected="true" />
+                        <listitem label="Weekly" value="WEEKLY" />
+                    </listbox>
+                </div>
+                <div class="form-item">
+                    <h:label class="form-label">Recurrence End Date</h:label>
+                    <datebox value="@bind(vm.recurrenceEndDate)" format="yyyy-MM-dd" constraint="no past" width="100%"/>
+                </div>
+            </div>
+
+            <!-- Invite Colleagues Setup -->
+            <div class="form-group" style="margin-top: 16px;">
+                <h:label class="form-label">Invite Colleagues (Hold Ctrl/Cmd to select multiple)</h:label>
+                <listbox model="@load(vm.colleagues)" selectedItems="@bind(vm.selectedColleagues)" multiple="true" checkmark="true" rows="4" style="border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem; background: #ffffff;">
+                    <template name="model" var="colleague">
+                        <listitem label="@load(colleague.username)" value="@load(colleague)" />
+                    </template>
+                </listbox>
+            </div>
         </div>
 
         <!-- 2. Select a Room Card Grid -->

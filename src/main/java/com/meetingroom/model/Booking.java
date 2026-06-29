@@ -3,7 +3,9 @@ package com.meetingroom.model;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -13,6 +15,8 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString(exclude = "invitees")
+@EqualsAndHashCode(exclude = "invitees")
 @Entity
 @Table(name = "bookings")
 public class Booking {
@@ -49,4 +53,13 @@ public class Booking {
     @Column(name = "notification_read", nullable = false)
     @Builder.Default
     private boolean notificationRead = true;
+
+    @Column(name = "recurrence_id")
+    private String recurrenceId;
+
+    @Column(name = "recurrence_type")
+    private String recurrenceType;
+
+    @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private java.util.Set<BookingInvitee> invitees;
 }

@@ -171,6 +171,19 @@ public class AdminBookingsViewModel {
         }
     }
 
+    @Command
+    @NotifyChange({"filteredBookings", "totalBookings", "activeBookings", "cancelledBookings"})
+    public void cancelSeries(@BindingParam("recurrenceId") String recurrenceId) {
+        try {
+            bookingService.cancelRecurringSeries(recurrenceId);
+            ToastUtil.success("Entire recurring series cancelled successfully.");
+            loadData();
+        } catch (Exception e) {
+            log.error("Failed to cancel recurring series", e);
+            ToastUtil.error("Failed to cancel series: " + e.getMessage());
+        }
+    }
+
     // Getters and Setters
     public List<Booking> getFilteredBookings() { return filteredBookings; }
     public int getTotalBookings() { return totalBookings; }
