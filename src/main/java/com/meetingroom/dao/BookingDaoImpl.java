@@ -125,4 +125,15 @@ public class BookingDaoImpl implements BookingDao {
             return null;
         }
     }
+
+    @Override
+    public List<Booking> findByDateRange(LocalDate startDate, LocalDate endDate){
+        return  sessionFactory.getCurrentSession()
+                .createQuery("from Booking where bookingDate between :startDate and :endDate order by bookingDate desc, startTime desc", Booking.class)
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
+                .list();
+    }
+
+
 }

@@ -3,6 +3,7 @@ package com.meetingroom.service;
 import com.meetingroom.model.Booking;
 import com.meetingroom.model.BookingInvitee;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface BookingService {
@@ -17,4 +18,6 @@ public interface BookingService {
 
     List<BookingInvitee> getInvitationsForUser(Long userId);
     void respondToInvitation(Long bookingId, Long userId, String status) throws Exception;
+    List<Booking> getBookingsByDateRange(LocalDate startDate, LocalDate endDate);
+
 }

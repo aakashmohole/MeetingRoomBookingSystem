@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 
@@ -214,5 +216,11 @@ public class BookingServiceImpl implements BookingService{
         invitee.setStatus(status.toUpperCase());
         bookingDao.updateInvitee(invitee);
         log.debug("Invitation response saved successfully.");
+    }
+
+    @Override
+    public List<Booking> getBookingsByDateRange(LocalDate startDate, LocalDate endDate){
+        log.info("Fetching all booking between {} and {}", startDate, endDate);
+        return bookingDao.findByDateRange(startDate, endDate);
     }
 }

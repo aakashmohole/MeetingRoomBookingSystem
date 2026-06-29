@@ -2,9 +2,11 @@ package com.meetingroom.viewmodel;
 
 import com.meetingroom.model.Booking;
 import com.meetingroom.model.User;
+import com.meetingroom.service.BookingExportService;
 import com.meetingroom.service.BookingService;
 import com.meetingroom.util.ToastUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.formula.atp.Switch;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.Init;
@@ -14,8 +16,10 @@ import org.zkoss.zk.ui.Sessions;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 
+import java.awt.print.Book;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -27,6 +31,10 @@ public class AdminBookingsViewModel {
 
     @WireVariable
     private BookingService bookingService;
+
+    @WireVariable
+    private BookingExportService bookingExportService;
+
 
     private User currentUser;
     private List<Booking> allBookings = new ArrayList<>();
@@ -48,6 +56,16 @@ public class AdminBookingsViewModel {
     private String remarksText = "";
     private String pendingStatus = "";
     private String dialogTitle = "";
+
+    // dailog controls
+    private boolean exportDialogOpen = false;
+    private String exportScope = "ALL";
+    private Date exportStartDate;
+    private Date exportEndDate;
+    private String exportFormat = "EXCEL";
+
+
+
 
     @Init
     public void init() {
@@ -184,6 +202,100 @@ public class AdminBookingsViewModel {
         }
     }
 
+
+    @Command
+    @NotifyChange("exportDialogOpen")
+    public void openExportDialog(){
+        this.exportScope = "ALL";
+        this.exportStartDate = null;
+        this.exportEndDate =  null;
+        this.exportFormat = "EXCEL";
+        this.exportDialogOpen = true;
+    }
+
+    @Command
+    @NotifyChange("exportDialogOpen")
+    public void closeExportDialog(){
+        this.exportDialogOpen = false;
+    }
+
+    @Command
+    @NotifyChange({"exportDialogOpen", "exportScope"})
+    public void changeExportScope() {
+        // Triggers visibility changes for range boxes
+    }
+
+    @Command
+    @NotifyChange("exportDialogOpen")
+    public void performExport(){
+        List<Booking> bookingsToExport;
+        String fileName = "";
+
+        if("RANGE".equals(exportScope)){
+            if(exportStartDate == null || exportEndDate == null){
+                ToastUtil.error("Please select both Start and End Dates for exporting.");
+                return;
+            }
+            if (exportStartDate.after(exportEndDate)) {
+                ToastUtil.error("Start Date cannot be after End Date.");
+                return;
+            }
+
+            LocalDate start = exportStartDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            LocalDate end = exportEndDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            bookingsToExport = bookingService.getBookingsByDateRange(start, end);
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+            fileName = "booking_export_" + start.format(formatter) + "_" + end.format(formatter);
+        }else{
+            bookingsToExport = bookingService.getAllBookings();
+            LocalDate today = LocalDate.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+            fileName = "booking_export_" + today.format(formatter);
+        }
+        if (bookingsToExport.isEmpty()) {
+            ToastUtil.error("No bookings found in the selected range to export.");
+            return;
+        }
+
+        try{
+            byte[] fileData = null;
+//            String fileName = "booking_export_" + System.currentTimeMillis();
+            String contentType = "";
+
+            switch (exportFormat){
+                case "EXCEL":
+                    fileData = bookingExportService.exportToExcel(bookingsToExport);
+                    fileName += ".xlsx";
+                    contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+                    break;
+                case "PDF":
+                    fileData = bookingExportService.exportToPdf(bookingsToExport);
+                    fileName += ".pdf";
+                    contentType = "application/pdf";
+                    break;
+                case "XML":
+                    fileData = bookingExportService.exportToXml(bookingsToExport);
+                    fileName += ".xml";
+                    contentType = "text/xml";
+                    break;
+                default:
+                    ToastUtil.error("Invalid export format.");
+                    return;
+            }
+
+            if (fileData != null) {
+                org.zkoss.zul.Filedownload.save(fileData, contentType, fileName);
+                this.exportDialogOpen = false;
+                ToastUtil.success("Export successful! Download started.");
+            }
+
+        } catch (Exception e) {
+            log.error("Error occurred while exporting bookings", e);
+            ToastUtil.error("An error occurred during export: " + e.getMessage());
+        }
+    }
+
     // Getters and Setters
     public List<Booking> getFilteredBookings() { return filteredBookings; }
     public int getTotalBookings() { return totalBookings; }
@@ -195,6 +307,46 @@ public class AdminBookingsViewModel {
     public void setSelectedStatus(String selectedStatus) { this.selectedStatus = selectedStatus; }
     public Date getFilterDate() { return filterDate; }
     public void setFilterDate(Date filterDate) { this.filterDate = filterDate; }
+
+    public boolean isExportDialogOpen() {
+        return exportDialogOpen;
+    }
+
+    public String getExportScope() {
+        return exportScope;
+    }
+
+    public void setExportFormat(String exportFormat) {
+        this.exportFormat = exportFormat;
+    }
+
+    public void setExportEndDate(Date exportEndDate) {
+        this.exportEndDate = exportEndDate;
+    }
+
+    public void setExportStartDate(Date exportStartDate) {
+        this.exportStartDate = exportStartDate;
+    }
+
+    public void setExportScope(String exportScope) {
+        this.exportScope = exportScope;
+    }
+
+    public void setExportDialogOpen(boolean exportDialogOpen) {
+        this.exportDialogOpen = exportDialogOpen;
+    }
+
+    public Date getExportStartDate() {
+        return exportStartDate;
+    }
+
+    public Date getExportEndDate() {
+        return exportEndDate;
+    }
+
+    public String getExportFormat() {
+        return exportFormat;
+    }
 
     // Dialog Getters and Setters
     public boolean isRemarksDialogOpen() { return remarksDialogOpen; }

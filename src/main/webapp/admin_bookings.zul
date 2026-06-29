@@ -282,7 +282,9 @@
                              onChange="@command('applyFilters')"/>
                 </div>
                 <button label="Reset Filters" sclass="btn-reset" onClick="@command('resetFilters')" />
-                <button label="Export" sclass="btn-reset" onClick="" />
+                <button label="Export Bookings"
+                        style="background: #2563eb; color: white; border: none; border-radius: 8px; padding: 10px 20px; font-weight: 600; cursor: pointer; height: 38px; transition: all 0.2s ease;"
+                        onClick="@command('openExportDialog')" />
             </div>
         </div>
 
@@ -391,6 +393,62 @@
                 </hlayout>
             </vlayout>
         </window>
+
+        <!-- Modal Dialog for Booking Export Option -->
+        <window title="Export Bookings" mode="modal" border="normal" width="460px"
+                visible="@load(vm.exportDialogOpen)" onClose="@command('closeExportDialog')"
+                style="border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);">
+
+            <vlayout spacing="18px" style="padding: 20px;">
+                <h:p style="color: #64748b; font-size: 0.9rem; margin: 0 0 10px 0;">
+                    Select export range settings and format options to generate your report.
+                </h:p>
+
+                <!-- Scope Choice -->
+                <vlayout spacing="6px">
+                    <label value="Export Scope:" style="font-weight: 600; color: #334155; font-size: 0.9rem;" />
+                    <radiogroup id="exportRange" selectedItem="@bind(vm.exportScope)">
+                        <hlayout spacing="24px">
+                            <radio label="Download All" value="ALL" onCheck="@command('changeExportScope')" />
+                            <radio label="Choose Date Range" value="RANGE" onCheck="@command('changeExportScope')" />
+                        </hlayout>
+                    </radiogroup>
+                </vlayout>
+
+                <!-- Conditional Date Range Input -->
+                <vlayout spacing="8px" visible="@load(vm.exportScope eq 'RANGE')"
+                         style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; margin-top: 5px;">
+                    <hlayout spacing="12px" style="align-items: center; justify-content: space-between;">
+                        <label value="From Date:" style="font-size: 0.85rem; color: #475569; font-weight: 500;" />
+                        <datebox value="@bind(vm.exportStartDate)" format="yyyy-MM-dd" width="180px" />
+                    </hlayout>
+                    <hlayout spacing="12px" style="align-items: center; justify-content: space-between; margin-top: 6px;">
+                        <label value="To Date:" style="font-size: 0.85rem; color: #475569; font-weight: 500;" />
+                        <datebox value="@bind(vm.exportEndDate)" format="yyyy-MM-dd" width="180px" />
+                    </hlayout>
+                </vlayout>
+
+                <!-- Format Selector -->
+                <vlayout spacing="6px">
+                    <label value="Export Format:" style="font-weight: 600; color: #334155; font-size: 0.9rem;" />
+                    <listbox mold="select" selectedItem="@bind(vm.exportFormat)"
+                             style="width: 100%; border: 1px solid #cbd5e1; border-radius: 8px; padding: 8px; font-size: 0.9rem;">
+                        <listitem label="Excel Spreadsheet (.xlsx)" value="EXCEL" />
+                        <listitem label="Adobe PDF (.pdf)" value="PDF" />
+                        <listitem label="XML Document (.xml)" value="XML" />
+                    </listbox>
+                </vlayout>
+
+                <!-- Actions -->
+                <hlayout style="width: 100%; justify-content: flex-end; margin-top: 10px;" spacing="12px">
+                    <button label="Cancel" onClick="@command('closeExportDialog')"
+                            style="background: #f1f5f9; border: 1px solid #cbd5e1; color: #475569; border-radius: 8px; padding: 10px 20px; cursor: pointer; font-weight: 600; font-size: 0.85rem;" />
+                    <button label="Download" onClick="@command('performExport')"
+                            style="background: #2563eb; border: none; color: white; border-radius: 8px; padding: 10px 20px; cursor: pointer; font-weight: 600; font-size: 0.85rem;" />
+                </hlayout>
+            </vlayout>
+        </window>
+
         </div>
     </div>
 </zk>

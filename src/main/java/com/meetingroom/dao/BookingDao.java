@@ -23,4 +23,8 @@ public interface BookingDao {
     void updateInvitee(BookingInvitee invitee);
     List<BookingInvitee> findInviteesByUser(Long userId);
     BookingInvitee findInviteeByBookingAndUser(Long bookingId, Long userId);
+
+    List<Booking> findByDateRange(LocalDate startDate, LocalDate endDate);
+
+
 }
