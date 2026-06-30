@@ -1,0 +1,77 @@
+2026-06-29 17:05:43 [main] INFO  org.zkoss.zk.ui.http.WebManager - Starting ZK 9.6.0.2 CE (build: 2022052709)
+2026-06-29 17:05:43 [main] INFO  org.zkoss.zk.ui.sys.ConfigParser - Loading system default
+2026-06-29 17:05:43 [main] INFO  org.zkoss.zk.ui.sys.ConfigParser - Parsing jar:file:/Users/apple/.m2/repository/org/zkoss/zk/zul/9.6.0.2/zul-9.6.0.2.jar!/metainfo/zk/zk.xml
+2026-06-29 17:05:43 [main] INFO  org.zkoss.zk.ui.sys.ConfigParser - Parsing file:/Users/apple/Aakash/Spring/MeetingRoomBookingSystem/src/main/webapp/WEB-INF/zk.xml
+2026-06-29 17:05:43 [main] ERROR org.zkoss.zk.ui.http.WebManager - Unable to load /WEB-INF/zk.xml
+org.zkoss.zk.ui.UiException: file:/Users/ap...main/webapp/WEB-INF/zk.xml:4:21: The file-check-period element must be a positive number, not 0
+	at org.zkoss.zk.ui.sys.ConfigParser.parseInteger(ConfigParser.java:970)
+	at org.zkoss.zk.ui.sys.ConfigParser.parseDesktopConfig(ConfigParser.java:657)
+	at org.zkoss.zk.ui.sys.ConfigParser.parse(ConfigParser.java:379)
+	at org.zkoss.zk.ui.sys.ConfigParser.parse(ConfigParser.java:302)
+	at org.zkoss.zk.ui.http.WebManager.<init>(WebManager.java:180)
+	at org.zkoss.zk.ui.http.WebManager.<init>(WebManager.java:111)
+	at org.zkoss.zk.ui.http.HttpSessionListener23.contextInitialized(HttpSessionListener23.java:141)
+	at org.eclipse.jetty.server.handler.ContextHandler.callContextInitialized(ContextHandler.java:1073)
+	at org.eclipse.jetty.servlet.ServletContextHandler.callContextInitialized(ServletContextHandler.java:572)
+	at org.eclipse.jetty.server.handler.ContextHandler.contextInitialized(ContextHandler.java:1002)
+	at org.eclipse.jetty.servlet.ServletHandler.initialize(ServletHandler.java:765)
+	at org.eclipse.jetty.servlet.ServletContextHandler.startContext(ServletContextHandler.java:379)
+	at org.eclipse.jetty.webapp.WebAppContext.startWebapp(WebAppContext.java:1449)
+	at org.eclipse.jetty.maven.plugin.JettyWebAppContext.startWebapp(JettyWebAppContext.java:328)
+	at org.eclipse.jetty.webapp.WebAppContext.startContext(WebAppContext.java:1414)
+	at org.eclipse.jetty.server.handler.ContextHandler.doStart(ContextHandler.java:916)
+	at org.eclipse.jetty.servlet.ServletContextHandler.doStart(ServletContextHandler.java:288)
+	at org.eclipse.jetty.webapp.WebAppContext.doStart(WebAppContext.java:524)
+	at org.eclipse.jetty.maven.plugin.JettyWebAppContext.doStart(JettyWebAppContext.java:397)
+	at org.eclipse.jetty.util.component.AbstractLifeCycle.start(AbstractLifeCycle.java:73)
+	at org.eclipse.jetty.util.component.ContainerLifeCycle.start(ContainerLifeCycle.java:169)
+	at org.eclipse.jetty.util.component.ContainerLifeCycle.doStart(ContainerLifeCycle.java:117)
+	at org.eclipse.jetty.server.handler.AbstractHandler.doStart(AbstractHandler.java:97)
+	at org.eclipse.jetty.util.component.AbstractLifeCycle.start(AbstractLifeCycle.java:73)
+	at org.eclipse.jetty.util.component.ContainerLifeCycle.start(ContainerLifeCycle.java:169)
+	at org.eclipse.jetty.util.component.ContainerLifeCycle.doStart(ContainerLifeCycle.java:117)
+	at org.eclipse.jetty.server.handler.AbstractHandler.doStart(AbstractHandler.java:97)
+	at org.eclipse.jetty.util.component.AbstractLifeCycle.start(AbstractLifeCycle.java:73)
+	at org.eclipse.jetty.util.component.ContainerLifeCycle.start(ContainerLifeCycle.java:169)
+	at org.eclipse.jetty.server.Server.start(Server.java:423)
+	at org.eclipse.jetty.util.component.ContainerLifeCycle.doStart(ContainerLifeCycle.java:110)
+	at org.eclipse.jetty.server.handler.AbstractHandler.doStart(AbstractHandler.java:97)
+	at org.eclipse.jetty.server.Server.doStart(Server.java:387)
+	at org.eclipse.jetty.util.component.AbstractLifeCycle.start(AbstractLifeCycle.java:73)
+	at org.eclipse.jetty.maven.plugin.AbstractJettyMojo.startJetty(AbstractJettyMojo.java:449)
+	at org.eclipse.jetty.maven.plugin.AbstractJettyMojo.execute(AbstractJettyMojo.java:310)
+	at org.eclipse.jetty.maven.plugin.JettyRunMojo.execute(JettyRunMojo.java:150)
+	at org.apache.maven.plugin.DefaultBuildPluginManager.executeMojo(DefaultBuildPluginManager.java:126)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.doExecute2(MojoExecutor.java:328)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.doExecute(MojoExecutor.java:316)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:212)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:174)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.access$000(MojoExecutor.java:75)
+	at org.apache.maven.lifecycle.internal.MojoExecutor$1.run(MojoExecutor.java:162)
+	at org.apache.maven.plugin.DefaultMojosExecutionStrategy.execute(DefaultMojosExecutionStrategy.java:39)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:159)
+	at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject(LifecycleModuleBuilder.java:105)
+	at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject(LifecycleModuleBuilder.java:73)
+	at org.apache.maven.lifecycle.internal.builder.singlethreaded.SingleThreadedBuilder.build(SingleThreadedBuilder.java:53)
+	at org.apache.maven.lifecycle.internal.LifecycleStarter.execute(LifecycleStarter.java:118)
+	at org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:261)
+	at org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:173)
+	at org.apache.maven.DefaultMaven.execute(DefaultMaven.java:101)
+	at org.apache.maven.cli.MavenCli.execute(MavenCli.java:919)
+	at org.apache.maven.cli.MavenCli.doMain(MavenCli.java:285)
+	at org.apache.maven.cli.MavenCli.main(MavenCli.java:207)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.launchEnhanced(Launcher.java:255)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.launch(Launcher.java:201)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.mainWithExitCode(Launcher.java:362)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.main(Launcher.java:314)
+2026-06-29 17:05:52 [qtp1731406622-53] INFO  o.z.u.resource.impl.LabelLoaderImpl - Loading labels for en_GB
+2026-06-29 17:05:52 [qtp1731406622-53] INFO  o.z.u.resource.impl.LabelLoaderImpl - Loading labels for en
+2026-06-29 17:05:53 [qtp1731406622-46] INFO  c.m.viewmodel.LoginViewModel - Initializing LoginViewModel. Checking active sessions.
+2026-06-29 17:06:02 [qtp1731406622-47] INFO  c.m.viewmodel.LoginViewModel - Login attempt for username: tester
+2026-06-29 17:06:02 [qtp1731406622-47] INFO  c.m.service.UserServiceImpl - Attempting to login user: tester
+2026-06-29 17:06:02 [qtp1731406622-47] INFO  c.m.viewmodel.LoginViewModel - Login successful for user: tester. Storing in session and redirecting.
+2026-06-29 17:06:37 [qtp1731406622-47] INFO  o.zkoss.util.resource.ResourceCache - Source is changed: /index.zul
+2026-06-29 17:06:56 [qtp1731406622-47] INFO  o.zkoss.util.resource.ResourceCache - Source is changed: /index.zul
+2026-06-29 17:10:04 [qtp1731406622-47] INFO  c.m.service.BookingServiceImpl - Fetching invitations for User ID: 3

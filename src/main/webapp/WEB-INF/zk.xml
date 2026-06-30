@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk>
+    <!-- Development Mode Settings to Disable ZUL Caching -->
+    <desktop-config>
+        <!-- Checks for file modifications on every request (0 seconds) -->
+        <file-check-period>0</file-check-period>
+    </desktop-config>
+
+    <!-- Disable ZK's internal resource caching for instant UI hot-reloading -->
+    <library-property>
+        <name>org.zkoss.zk.ZUML.cache</name>
+        <value>false</value>
+    </library-property>
+    <library-property>
+        <name>org.zkoss.web.classWebResource.cache</name>
+        <value>false</value>
+    </library-property>
+    <library-property>
+        <name>org.zkoss.zk.WPD.cache</name>
+        <value>false</value>
+    </library-property>
+    <library-property>
+        <name>org.zkoss.zk.WCS.cache</name>
+        <value>false</value>
+    </library-property>
+</zk>

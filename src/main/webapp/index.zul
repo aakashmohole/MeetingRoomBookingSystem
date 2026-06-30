@@ -376,11 +376,6 @@
                         <h:p class="action-desc">Monitor all user bookings, schedules, and active reservations across all rooms.</h:p>
                         <button label="View All Schedules" class="btn-secondary" style="margin-top: 10px;" onClick='Executions.sendRedirect("admin_bookings.zul")'/>
                     </div>
-                    <div class="action-card">
-                        <h:h3 class="action-title">User Accounts</h:h3>
-                        <h:p class="action-desc">Manage employee registration, view profiles, and update roles/permissions.</h:p>
-                        <button label="Manage Users" class="btn-secondary" style="margin-top: 10px;" onClick='alert("User Accounts Management console is coming soon!")'/>
-                    </div>
                 </div>
             </div>
         </div>

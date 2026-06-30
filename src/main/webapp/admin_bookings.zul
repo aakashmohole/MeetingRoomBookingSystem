@@ -288,7 +288,7 @@
             </div>
         </div>
 
-        <!-- Bookings Listbox -->
+        <!-- Bookings List-box -->
         <listbox model="@load(vm.filteredBookings)" emptyMessage="No bookings matched your filter criteria.">
             <listhead>
                 <listheader label="User / Employee" width="18%" />
@@ -408,10 +408,11 @@
                 <vlayout spacing="6px">
                     <label value="Export Scope:" style="font-weight: 600; color: #334155; font-size: 0.9rem;" />
                     <radiogroup id="exportRange" selectedItem="@bind(vm.exportScope)">
-                        <hlayout spacing="24px">
+                        <vlayout spacing="10px">
                             <radio label="Download All" value="ALL" onCheck="@command('changeExportScope')" />
+                            <radio label="Export Current Filtered List" value="FILTERED" onCheck="@command('changeExportScope')" />
                             <radio label="Choose Date Range" value="RANGE" onCheck="@command('changeExportScope')" />
-                        </hlayout>
+                        </vlayout>
                     </radiogroup>
                 </vlayout>
 

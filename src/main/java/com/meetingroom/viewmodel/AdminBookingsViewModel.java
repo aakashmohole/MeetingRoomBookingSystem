@@ -231,7 +231,12 @@ public class AdminBookingsViewModel {
         List<Booking> bookingsToExport;
         String fileName = "";
 
-        if("RANGE".equals(exportScope)){
+        if ("FILTERED".equals(exportScope)) {
+            bookingsToExport = new ArrayList<>(filteredBookings);
+            LocalDate today = LocalDate.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+            fileName = "booking_export_filtered_" + today.format(formatter);
+        } else if("RANGE".equals(exportScope)){
             if(exportStartDate == null || exportEndDate == null){
                 ToastUtil.error("Please select both Start and End Dates for exporting.");
                 return;

@@ -177,6 +177,20 @@
                     </configuration>
                 </configuration>
             </plugin>
+
+            <!-- Jetty Maven Plugin for Instant UI Hot-reloading and Code Scan Auto-restarts -->
+            <plugin>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-maven-plugin</artifactId>
+                <version>9.4.53.v20231009</version>
+                <configuration>
+                    <!-- Scan for Java class modifications and restart context every 2 seconds -->
+                    <scanIntervalSeconds>2</scanIntervalSeconds>
+                    <webApp>
+                        <contextPath>/meeting-room-booking-system</contextPath>
+                    </webApp>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
